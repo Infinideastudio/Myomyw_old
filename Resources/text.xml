@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Dict>
+	<p key="pvp" value="单机双人"/>
+	<p key="pva" value="人机对战"/>
+	<p key="blue wins" value="蓝方胜利"/>
+	<p key="green wins" value="绿方胜利"/>
+	<p key="back" value="返回"/>
+</Dict>
