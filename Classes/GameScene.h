@@ -11,7 +11,7 @@ protected:
 	int lCol = defaultLCol, rCol = defaultRCol;//棋盘大小
 	Side turn = left;//当前回合
 	Chessman chessmen[maxLCol][maxRCol];//棋盘
-	bool moving;//是否移动中
+	bool moving = false;//是否移动中
 	int movingCol;//移动中的列
 	Chessman movingNewChessman;//移出来的新棋子
 	float drawSize;
