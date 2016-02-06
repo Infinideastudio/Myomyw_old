@@ -45,15 +45,19 @@ void PvaGameScene::changeTurn()
 			float weighting = 0;//这一行的权重
 			for (int j = 0; j < lCol; j++) {
 				float change = 0;
-				switch (chessmen[j][i]) {
+				switch (chessmen[j][i]) { 
 				case key:
-					change = -3;
+					//对最下面一列的红球给予特别特别关注
+					if (j == lCol - 1)
+						change = -6;
+					else
+						change = -3;
 					break;
 				case addCol:
-					change = 1;
+					change = -1;
 					break;
 				case delCol:
-					change = -1;
+					change = 1;
 					break;
 				}
 				//离出口越近权重越大(加上一点随机)
