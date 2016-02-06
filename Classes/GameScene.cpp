@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "XmlData.h"
 #include "ResultScene.h"
+#include "MainScene.h"
 USING_NS_CC;
 bool GameScene::init()
 {
@@ -12,6 +13,15 @@ bool GameScene::init()
 			chessmen[i][j] = common;
 		}
 	}
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	//--返回按钮--//
+	auto backItem = MenuItemImage::create("BackNormal.png", "BackSelected.png", [](Ref* pSender)
+	{Director::getInstance()->replaceScene(MainScene::create()); });
+	backItem->setPosition(Vec2(backItem->getContentSize().width / 2 + 10, visibleSize.height - backItem->getContentSize().height / 2 - 10));
+	auto menu = Menu::create(backItem, NULL);
+	menu->setPosition(Vec2::ZERO);
+	this->addChild(menu);
+
 	//--网格绘制节点--//
 	gridDrawNode = DrawNode::create();
 	this->addChild(gridDrawNode, 1);
