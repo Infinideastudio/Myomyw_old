@@ -13,4 +13,6 @@ private:
 	void activateEjector(int col);
 	void endMoving();
 	void changeTurn();
+	void leftWins();
+	void rightWins();
 };

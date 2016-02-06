@@ -1,15 +1,15 @@
 #include "ResultScene.h"
 #include "MainScene.h"
 #include "XmlData.h"
-bool ResultScene::init()
+bool ResultScene::init(std::string text, Color4B color)
 {
 	if (!Scene::init())
 		return false;
-	label = Label::createWithTTF("", "fonts/Deng.ttf", 48);
-	label->setTextColor(Color4B(0, 0, 0, 255));
+	auto label = Label::createWithTTF(text, "fonts/Deng.ttf", 48);
+	label->setTextColor(color);
 	label->setPosition(0.5*Director::getInstance()->getVisibleSize());
 	this->addChild(label);
-	auto backLabel= Label::createWithTTF(XmlData::text["back"], "fonts/Deng.ttf", 32);
+	auto backLabel = Label::createWithTTF(XmlData::text["back"], "fonts/Deng.ttf", 32);
 	backLabel->setTextColor(Color4B(0, 0, 0, 255));
 	auto backItem = MenuItemLabel::create(backLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(MainScene::create()); });
@@ -20,7 +20,18 @@ bool ResultScene::init()
 	return true;
 }
 
-void ResultScene::setText(std::string text)
+ResultScene* ResultScene::create(std::string text, Color4B color)
 {
-	label->setString(text);
+	ResultScene* pRet = new(std::nothrow) ResultScene();
+	if (pRet && pRet->init(text, color))
+	{
+		pRet->autorelease();
+		return pRet;
+	}
+	else
+	{
+		delete pRet;
+		pRet = nullptr;
+		return nullptr;
+	}
 }

@@ -34,7 +34,7 @@ protected:
 	virtual void beginMoving(int col, Chessman chessman);
 	virtual void endMoving();
 	virtual void changeTurn();
+	virtual void leftWins();
+	virtual void rightWins();
 	static Chessman getRandomChessman();
-private:
-
 };

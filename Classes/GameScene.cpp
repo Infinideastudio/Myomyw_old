@@ -188,9 +188,7 @@ void GameScene::endMoving()
 		chessmen[movingCol][0] = movingNewChessman;
 		switch (lastChessman) {
 		case key: {
-			auto rs = ResultScene::create();
-			rs->setText(XmlData::text["blue wins"]);
-			Director::getInstance()->replaceScene(rs);
+			rightWins();
 			break;
 		}
 		case addCol:
@@ -209,9 +207,7 @@ void GameScene::endMoving()
 		chessmen[0][movingCol] = movingNewChessman;
 		switch (lastChessman) {
 		case key: {
-			auto rs = ResultScene::create();
-			rs->setText(XmlData::text["green wins"]);
-			Director::getInstance()->replaceScene(rs);
+			leftWins();
 			break;
 		}
 		case addCol:
@@ -228,6 +224,18 @@ void GameScene::endMoving()
 void GameScene::changeTurn()
 {
 	turn = (turn == left ? right : left);
+}
+
+void GameScene::leftWins()
+{
+	auto rs = ResultScene::create(XmlData::text["green wins"], Color4B(0, 255, 0, 255));
+	Director::getInstance()->replaceScene(rs);
+}
+
+void GameScene::rightWins()
+{
+	auto rs = ResultScene::create(XmlData::text["blue wins"], Color4B(0, 0, 255, 255));
+	Director::getInstance()->replaceScene(rs);
 }
 
 Chessman GameScene::getRandomChessman()

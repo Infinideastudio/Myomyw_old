@@ -4,9 +4,6 @@ USING_NS_CC;
 class ResultScene :public cocos2d::Scene
 {
 public:
-	bool init();
-	CREATE_FUNC(ResultScene);
-	void setText(std::string text);
-private:
-	Label* label;
+	bool init(std::string text, Color4B color);
+	static ResultScene* create(std::string text, Color4B color);
 };

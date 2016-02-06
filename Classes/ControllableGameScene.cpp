@@ -1,6 +1,5 @@
 #include "ControllableGameScene.h"
 
-
 bool ControllableGameScene::init()
 {
 	if (!GameScene::init())

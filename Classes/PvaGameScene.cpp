@@ -1,4 +1,6 @@
 #include "PvaGameScene.h"
+#include "XmlData.h"
+#include "ResultScene.h"
 
 bool PvaGameScene::init()
 {
@@ -84,4 +86,16 @@ void PvaGameScene::changeTurn()
 		beginMoving(AIMovingCol, getRandomChessman());
 		AIMovementTimes--;
 	}
+}
+
+void PvaGameScene::leftWins()
+{
+	auto rs = ResultScene::create(XmlData::text["player wins"], Color4B(0, 255, 0, 255));
+	Director::getInstance()->replaceScene(rs);
+}
+
+void PvaGameScene::rightWins()
+{
+	auto rs = ResultScene::create(XmlData::text["ai wins"], Color4B(0, 0, 0, 255));
+	Director::getInstance()->replaceScene(rs);
 }

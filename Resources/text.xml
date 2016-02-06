@@ -4,5 +4,8 @@
 	<p key="pva" value="人机对战"/>
 	<p key="blue wins" value="蓝方胜利"/>
 	<p key="green wins" value="绿方胜利"/>
+	<p key="player wins" value="你赢了"/>
+	<p key="ai wins" value="电脑赢了"/>
 	<p key="back" value="返回"/>
+	
 </Dict>
