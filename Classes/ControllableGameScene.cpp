@@ -61,15 +61,13 @@ void ControllableGameScene::endMoving()
 {
 	GameScene::endMoving();
 	if (moveByTouching) {
-		if (totalMovementTimes < maxMovementTimes) {
-			auto delayAction = DelayTime::create(movingCooling);
-			auto callingAction = CallFunc::create(CC_CALLBACK_0(ControllableGameScene::beginMoving, this, movingCol, getRandomChessman()));
-			auto delayAndCallingAction = Sequence::create(delayAction, callingAction, NULL);
-			this->runAction(delayAndCallingAction);
+		if (totalMovementTimes >= maxMovementTimes) {
+			holdingTouching = false;
 		}
-		else {
-			changeTurn();
-		}
+		auto delayAction = DelayTime::create(movingCooling);
+		auto callingAction = CallFunc::create(CC_CALLBACK_0(ControllableGameScene::beginMoving, this, movingCol, getRandomChessman()));
+		auto delayAndCallingAction = Sequence::create(delayAction, callingAction, NULL);
+		this->runAction(delayAndCallingAction);
 	}
 }
 
