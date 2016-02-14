@@ -1,0 +1,9 @@
+{
+  "name": "Server",
+  "version": "0.0.1",
+  "description": "Server",
+  "main": "app.js",
+  "dependencies": {
+    "socket.io": "^1.4.5"
+  }
+}

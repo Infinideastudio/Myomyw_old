@@ -40,6 +40,9 @@
     <ClCompile Include="..\Classes\PvaGameScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\PvoGameScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -66,10 +69,13 @@
     <ClInclude Include="..\Classes\PvpGameScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ControllableGameScene.h">
+    <ClInclude Include="..\Classes\PvaGameScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\PvaGameScene.h">
+    <ClInclude Include="..\Classes\PvoGameScene.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ControllableGameScene.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
