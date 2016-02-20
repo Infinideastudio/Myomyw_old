@@ -152,3 +152,7 @@ tests/cpp-tests/Resources/audio
 
 # cocos2d dir
 cocos2d/
+
+# node.js
+node_modules/
+.ntvs_analysis.dat
