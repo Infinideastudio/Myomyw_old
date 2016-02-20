@@ -114,6 +114,7 @@ void GameScene::buildChessboard()
 		ejector->setPosition(Vec2(topVertex.x + (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
 		ejector->setScaleX(diagonal / ejector->getContentSize().width);
 		ejector->setScaleY(diagonal / ejector->getContentSize().height);
+		ejector->setOpacity(150);
 		ejector->setTag(lCol + i);
 		ejectorNode->addChild(ejector);
 	}
@@ -224,6 +225,15 @@ void GameScene::endMoving()
 void GameScene::changeTurn()
 {
 	turn = (turn == left ? right : left);
+
+	int leftOpacity = (turn == left ? 255 : 150);
+	int rightOpacity = (turn == right ? 255 : 150);
+	for (int i = 0; i < lCol; i++) {
+		ejectorNode->getChildByTag(i)->setOpacity(leftOpacity);
+	}
+	for (int i = lCol; i < lCol + rCol; i++) {
+		ejectorNode->getChildByTag(i)->setOpacity(rightOpacity);
+	}
 }
 
 void GameScene::leftWins()

@@ -15,4 +15,5 @@ private:
 	void changeTurn();
 	void leftWins();
 	void rightWins();
+	void AIMove();
 };
