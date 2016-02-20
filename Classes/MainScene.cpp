@@ -17,7 +17,7 @@ bool MainScene::init()
 	auto pvpItem = MenuItemLabel::create(pvpLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvpGameScene::create()); });
 	pvpItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
-
+	
 	auto pvaLabel = Label::createWithTTF(XmlData::text["pva"], "fonts/Deng.ttf", 32);
 	pvaLabel->setTextColor(Color4B(0, 0, 0, 255));
 	auto pvaItem = MenuItemLabel::create(pvaLabel, [](Ref* pSender)

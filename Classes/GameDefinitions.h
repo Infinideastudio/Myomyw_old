@@ -7,5 +7,6 @@ const float movingTime = 0.3f;//移动用时
 const int maxMovementTimes = 5;//最大移动数量
 
 enum Side { left, right };
-enum Chessman { unknow, common, key, addCol, delCol };
+enum Chessman { c_unknown, common, key, addCol, delCol };
 enum GameMode { pvp, pva, pvo };
+enum EndGameReason { unknown, opponentLeft, youWin, youLose };

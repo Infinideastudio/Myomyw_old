@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dict>
-	<p key="pvp" value="单机双人"/>
-	<p key="pva" value="人机对战"/>
-	<p key="pvo" value="网络对战"/>
-	<p key="blue wins" value="蓝方胜利"/>
-	<p key="green wins" value="绿方胜利"/>
-	<p key="player wins" value="你赢了"/>
-	<p key="ai wins" value="电脑赢了"/>
-	<p key="online player wins" value="对手赢了"/>
-	<p key="back" value="返回"/>
-	<p key="enter address" value="输入服务器地址"/>
+  <p key="pvp" value="单机双人"/>
+  <p key="pva" value="人机对战"/>
+  <p key="pvo" value="网络对战"/>
+  <p key="blue wins" value="蓝方胜利"/>
+  <p key="green wins" value="绿方胜利"/>
+  <p key="player wins" value="你赢了"/>
+  <p key="ai wins" value="电脑赢了"/>
+  <p key="online player wins" value="对手赢了"/>
+  <p key="back" value="返回"/>
+  <p key="enter address" value="输入服务器地址"/>
 </Dict>

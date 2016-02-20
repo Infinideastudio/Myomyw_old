@@ -187,10 +187,9 @@ void GameScene::endMoving()
 		}
 		chessmen[movingCol][0] = movingNewChessman;
 		switch (lastChessman) {
-		case key: {
+		case key:
 			rightWins();
 			break;
-		}
 		case addCol:
 			setBoardSize(lCol, rCol + 1);
 			break;
@@ -206,10 +205,9 @@ void GameScene::endMoving()
 		}
 		chessmen[0][movingCol] = movingNewChessman;
 		switch (lastChessman) {
-		case key: {
+		case key:
 			leftWins();
 			break;
-		}
 		case addCol:
 			setBoardSize(lCol + 1, rCol);
 			break;
