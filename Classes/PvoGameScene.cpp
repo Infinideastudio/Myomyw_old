@@ -7,8 +7,7 @@ bool PvoGameScene::init(std::string address)
 {
 	if (!ControllableGameScene::init())
 		return false;
-	MessageBox(XmlData::text["unknown disconnect"].c_str(), "Myomyw");
-	MessageBox("жпнд", "Myomyw");
+
 	client = SocketIO::connect(address, *this);
 	if (!client)
 		return false;

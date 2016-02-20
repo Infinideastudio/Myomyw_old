@@ -5,6 +5,7 @@ var newChessman;
 const defaultLCol = 5, defaultRCol = 5;
 const maxLCol = 10, maxRCol = 10;
 const minLCol = 3, minRCol = 3;
+const maxMovementTimes = 5;
 
 const waiting = 0, playing = 1, over = 2;//房间状态
 const left = 0, right = 1;//左右侧
@@ -53,23 +54,34 @@ io.on('connection', function (socket) {
                 room.movingCol = data.col;
             }
             if (room.movingCol == data.col) {
-                var result = room.move(data.col, newChessman);
-                room.waitingPlayer().emit('beginMoving', { col: data.col, chessman: newChessman });
-                newChessman = getRandomChessman();
-                room.currentPlayer().emit('tellNewChessman', { chessman: newChessman });
-                if (result != nothing) {
-                    room.state = over;
-                    if (result == leftWins) {
-                        room.leftPlayer.emit('endGame', { reason: youWin });
-                        room.rightPlayer.emit('endGame', { reason: youLose });
+                if (room.totalMovementTimes < maxMovementTimes) {
+                    room.totalMovementTimes++;
+                    var result = room.move(data.col, newChessman);
+                    room.waitingPlayer().emit('beginMoving', { col: data.col, chessman: newChessman });
+                    newChessman = getRandomChessman();
+                    room.currentPlayer().emit('tellNewChessman', { chessman: newChessman });
+                    if (result != nothing) {
+                        room.state = over;
+                        if (result == leftWins) {
+                            room.leftPlayer.emit('endGame', { reason: youWin });
+                            room.rightPlayer.emit('endGame', { reason: youLose });
+                        }
+                        if (result == rightWins) {
+                            room.rightPlayer.emit('endGame', { reason: youWin });
+                            room.leftPlayer.emit('endGame', { reason: youLose });
+                        }
+                        closeRoom(players[socket.id]);
                     }
-                    if (result == rightWins) {
-                        room.rightPlayer.emit('endGame', { reason: youWin });
-                        room.leftPlayer.emit('endGame', { reason: youLose });
-                    }
-                    closeRoom(players[socket.id]);
+                } else {
+                    room.currentPlayer().emit('changeTurn');
+                    room.waitingPlayer().emit('changeTurn');
+                    newChessman = getRandomChessman();
+                    room.waitingPlayer().emit('tellNewChessman', { chessman: newChessman });
+                    room.changeTurn();
+                    room.movingCol = null;
+                    room.totalMovementTimes = 0;
+                    console.log('changeTurn ' + room.turn);
                 }
-
             }
         }
     });
@@ -82,6 +94,7 @@ io.on('connection', function (socket) {
             room.waitingPlayer().emit('tellNewChessman', { chessman: newChessman });
             room.changeTurn();
             room.movingCol = null;
+            room.totalMovementTimes = 0;
             console.log('changeTurn ' + room.turn);
         }
     });
@@ -147,6 +160,7 @@ function Room() {
         }
     }
     this.movingCol = null;
+    this.totalMovementTimes = 0;
 
     this.move = function (col, chessman) {
         var lastChessman;//暂存最底下的棋子
