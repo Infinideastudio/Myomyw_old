@@ -18,15 +18,20 @@ console.log('listening on port 8000');
 
 io.on('connection', function (socket) {
     console.log('connected ' + socket.id);
-    var find = false;
+    //寻找可加入的房间
+    var found = false;//是否找到了可加入的房间
     for (var i = 0; i < rooms.length; i++) {
+        //如果房间为空，则建立房间并将玩家设为左边的玩家
         if (!rooms[i]) {
-            find = true;
+            found = true;
             rooms[i] = new Room();
             rooms[i].leftPlayer = socket;
             players[socket.id] = i;
-        } else if (rooms[i].state == waiting) {
-            find = true;
+            break;
+        }
+        //如果房间为等待中，则将玩家设为右边的玩家并开始游戏
+        if (rooms[i].state == waiting) {
+            found = true;
             console.log("start room:" + i);
             players[socket.id] = i;
             rooms[i].rightPlayer = socket;
@@ -38,7 +43,8 @@ io.on('connection', function (socket) {
             break;
         }
     }
-    if (!find) {
+    //如果没有找到可加入的房间，则新建一个房间
+    if (!found) {
         var room = new Room();
         room.leftPlayer = socket;
         players[socket.id] = rooms.push(room) - 1;
@@ -117,17 +123,22 @@ io.on('connection', function (socket) {
 function closeRoom(id) {
     var room = rooms[id];
     if (room) {
-        room.leftPlayer.disconnect();
-        room.rightPlayer.disconnect();
-        if (room.state == playing) {
-
+        if (room.leftPlayer) {
+            room.leftPlayer.disconnect();
+            delete players[room.leftPlayer.id];
+        }
+        if (room.rightPlayer) {
+            room.rightPlayer.disconnect();
             delete players[room.rightPlayer.id];
         }
-
-        delete players[room.leftPlayer.id];
+        //删除房间（没有从数组里删除）
         delete rooms[id];
+        //如果房间位于结尾，则从数组里删除此房间，并向后删除可删除的房间
         if (id == rooms.length - 1) {
-            rooms.pop();
+            var i = rooms.length - 1;
+            while (room[i]) {
+                rooms.pop();
+            }
         }
     }
 }
