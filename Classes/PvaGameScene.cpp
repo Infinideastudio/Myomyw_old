@@ -19,11 +19,10 @@ void PvaGameScene::activateEjector(int col)
 void PvaGameScene::endMoving()
 {
 	if (turn == right) {
-		GameScene::endMoving();
 		if (AIMovementTimes > 0) {
 			AIMovementTimes--;
 			auto delayAction = DelayTime::create(movingCooling);
-			auto callingAction = CallFunc::create(CC_CALLBACK_0(PvaGameScene::beginMoving, this, AIMovingCol, getRandomChessman()));
+			auto callingAction = CallFunc::create(CC_CALLBACK_0(PvaGameScene::beginMoving, this, AIMovingCol, getNextChessman()));
 			auto delayAndCallingAction = Sequence::create(delayAction, callingAction, NULL);
 			this->runAction(delayAndCallingAction);
 		}
@@ -31,9 +30,8 @@ void PvaGameScene::endMoving()
 			changeTurn();
 		}
 	}
-	else {
-		ControllableGameScene::endMoving();
-	}
+	//放在下面是因为这个函数可能会changeTurn，而上面有turn的判断
+	ControllableGameScene::endMoving();
 }
 
 void PvaGameScene::changeTurn()
@@ -104,6 +102,6 @@ void PvaGameScene::AIMove()
 	else {
 		AIMovementTimes = times;
 	}
-	beginMoving(AIMovingCol, getRandomChessman());
+	beginMoving(AIMovingCol, getNextChessman());
 	AIMovementTimes--;
 }

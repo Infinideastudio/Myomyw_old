@@ -28,6 +28,7 @@ protected:
 	Node* ejectorNode;//放发射器的节点
 
 	bool setBoardSize(int lCol, int rCol);
+	void setTurnFlag();
 	virtual void buildChessboard();
 	virtual void updateChessboard();
 	Sprite* createSpriteByChessman(Chessman type);
@@ -36,5 +37,4 @@ protected:
 	virtual void changeTurn();
 	virtual void leftWins();
 	virtual void rightWins();
-	static Chessman getRandomChessman();
 };

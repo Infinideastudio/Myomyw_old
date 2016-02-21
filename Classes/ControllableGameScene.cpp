@@ -36,7 +36,7 @@ void ControllableGameScene::activateEjector(int col)
 {
 	if (!moving) {
 		moveByTouching = true;
-		beginMoving(col, getRandomChessman());
+		beginMoving(col, getNextChessman());
 	}
 }
 
@@ -61,7 +61,7 @@ void ControllableGameScene::endMoving()
 			}
 			else {
 				auto delayAction = DelayTime::create(movingCooling);
-				auto callingAction = CallFunc::create(CC_CALLBACK_0(ControllableGameScene::beginMoving, this, movingCol, getRandomChessman()));
+				auto callingAction = CallFunc::create(CC_CALLBACK_0(ControllableGameScene::beginMoving, this, movingCol, getNextChessman()));
 				auto delayAndCallingAction = Sequence::create(delayAction, callingAction, NULL);
 				this->runAction(delayAndCallingAction);
 			}
@@ -79,4 +79,19 @@ void ControllableGameScene::changeTurn()
 	totalMovementTimes = 0;
 	moveByTouching = false;
 	holdingTouching = false;
+}
+
+Chessman ControllableGameScene::getNextChessman()
+{
+	switch (rand() % 10)
+	{
+	case 0:
+		return key;
+	case 1:
+		return addCol;
+	case 2:
+		return delCol;
+	default:
+		return common;
+	}
 }

@@ -53,25 +53,22 @@ void PvoGameScene::activateEjector(int col)
 
 void PvoGameScene::beginMoving(int col, Chessman chessman)
 {
+	ControllableGameScene::beginMoving(col, chessman);
 	if (turn == left) {
-		ControllableGameScene::beginMoving(col, nextNewChessman);
 		if (holdingTouching && !disconnected) {
 			Json j;
 			j.add("col", col);
 			client->emit("beginMoving", j.toString());
 		}
 	}
-	else {
-		ControllableGameScene::beginMoving(col, chessman);
-	}
 }
 
 void PvoGameScene::endMoving()
 {
 	ControllableGameScene::endMoving();
-	if (shouldStopMoving) {
+	if (shouldChangeTurn) {
 		changeTurn();
-		shouldStopMoving = false;
+		shouldChangeTurn = false;
 	}
 }
 
@@ -81,6 +78,11 @@ void PvoGameScene::changeTurn()
 		client->emit("changeTurn", "");
 	}
 	ControllableGameScene::changeTurn();
+}
+
+Chessman PvoGameScene::getNextChessman()
+{
+	return nextChessman;
 }
 
 void PvoGameScene::leftWins()
@@ -118,7 +120,7 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 void PvoGameScene::onTellNewChessman(SIOClient * client, const std::string & data)
 {
 	Json j(data);
-	nextNewChessman = (Chessman)j.getInt("chessman");
+	nextChessman = (Chessman)j.getInt("chessman");
 }
 
 void PvoGameScene::onBeginMoving(SIOClient * client, const std::string & data)
@@ -132,8 +134,9 @@ void PvoGameScene::onBeginMoving(SIOClient * client, const std::string & data)
 void PvoGameScene::onChangeTurn(SIOClient * client, const std::string & data)
 {
 	if (turn == right) {
+		//如果还在移动就设置shouldChangeTurn为true，这样移动完成后就会切换回合
 		if (moving) {
-			shouldStopMoving = true;
+			shouldChangeTurn = true;
 		}
 		else {
 			changeTurn();

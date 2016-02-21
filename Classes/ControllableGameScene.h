@@ -19,4 +19,5 @@ protected:
 	virtual void beginMoving(int col, Chessman chessman);
 	virtual void endMoving();
 	virtual void changeTurn();
+	virtual Chessman getNextChessman();
 };

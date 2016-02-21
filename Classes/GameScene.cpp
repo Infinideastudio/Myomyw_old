@@ -44,6 +44,7 @@ bool GameScene::setBoardSize(int lCol, int rCol)
 {
 	if (lCol > maxLCol || lCol<minLCol || rCol>maxRCol || rCol < minRCol)
 		return false;
+	//如果棋盘变大，把多出来的那部分清空
 	if (this->lCol < lCol) {
 		for (int i = this->lCol; i < lCol; i++) {
 			for (int j = 0; j < rCol; j++) {
@@ -58,12 +59,27 @@ bool GameScene::setBoardSize(int lCol, int rCol)
 			}
 		}
 	}
+
 	this->lCol = lCol;
 	this->rCol = rCol;
 	buildChessboard();
 	return true;
 }
 
+//设置回合标志(现在是发射器的透明度)
+void GameScene::setTurnFlag()
+{
+	int leftOpacity = (turn == left ? 255 : 150);
+	int rightOpacity = (turn == right ? 255 : 150);
+	for (int i = 0; i < lCol; i++) {
+		ejectorNode->getChildByTag(i)->setOpacity(leftOpacity);
+	}
+	for (int i = lCol; i < lCol + rCol; i++) {
+		ejectorNode->getChildByTag(i)->setOpacity(rightOpacity);
+	}
+}
+
+//建立棋盘，在棋盘大小改变后调用
 void GameScene::buildChessboard()
 {
 	//画图时的网格数量(加上发射器)
@@ -79,7 +95,7 @@ void GameScene::buildChessboard()
 
 	//---建立模板遮罩---//
 	stencilDrawNode->clear();
-	//不包括发射器部分
+	//遮罩不包括发射器部分
 	//扩大一像素是为了不遮住线
 	Vec2 stencilPoly[] = { topVertex + Vec2(0, 1 - diagonal), leftVertex + Vec2(-1 + halfDiagonal, -halfDiagonal), bottomVertex + Vec2(0, -1) , rightVertex + Vec2(1 - halfDiagonal, -halfDiagonal) };
 	stencilDrawNode->drawSolidPoly(stencilPoly, 4, Color4F(1.0, 1.0, 1.0, 1.0));
@@ -114,13 +130,14 @@ void GameScene::buildChessboard()
 		ejector->setPosition(Vec2(topVertex.x + (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
 		ejector->setScaleX(diagonal / ejector->getContentSize().width);
 		ejector->setScaleY(diagonal / ejector->getContentSize().height);
-		ejector->setOpacity(150);
 		ejector->setTag(lCol + i);
 		ejectorNode->addChild(ejector);
 	}
+	setTurnFlag();
 	updateChessboard();
 }
 
+//更新棋盘，在棋子变化后调用(棋盘大小改变也会调用)
 void GameScene::updateChessboard()
 {
 	chessmanNode->removeAllChildren();
@@ -223,15 +240,7 @@ void GameScene::endMoving()
 void GameScene::changeTurn()
 {
 	turn = (turn == left ? right : left);
-
-	int leftOpacity = (turn == left ? 255 : 150);
-	int rightOpacity = (turn == right ? 255 : 150);
-	for (int i = 0; i < lCol; i++) {
-		ejectorNode->getChildByTag(i)->setOpacity(leftOpacity);
-	}
-	for (int i = lCol; i < lCol + rCol; i++) {
-		ejectorNode->getChildByTag(i)->setOpacity(rightOpacity);
-	}
+	setTurnFlag();
 }
 
 void GameScene::leftWins()
@@ -244,19 +253,4 @@ void GameScene::rightWins()
 {
 	auto rs = ResultScene::create(XmlData::text["blue wins"], Color4B(0, 0, 255, 255));
 	Director::getInstance()->replaceScene(rs);
-}
-
-Chessman GameScene::getRandomChessman()
-{
-	switch (rand() % 10)
-	{
-	case 0:
-		return key;
-	case 1:
-		return addCol;
-	case 2:
-		return delCol;
-	default:
-		return common;
-	}
 }
