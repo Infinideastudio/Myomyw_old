@@ -18,30 +18,28 @@ void PvaGameScene::activateEjector(int col)
 
 void PvaGameScene::endMoving()
 {
+	//下面的代码貌似能简化对吧，但别简化。。。
 	if (turn == right) {
+		ControllableGameScene::endMoving();
 		if (AIMovementTimes > 0) {
 			AIMovementTimes--;
-			auto delayAction = DelayTime::create(movingCooling);
-			auto callingAction = CallFunc::create(CC_CALLBACK_0(PvaGameScene::beginMoving, this, AIMovingCol, getNextChessman()));
-			auto delayAndCallingAction = Sequence::create(delayAction, callingAction, NULL);
-			this->runAction(delayAndCallingAction);
+			scheduleOnce(CC_CALLBACK_0(PvaGameScene::beginMoving, this, AIMovingCol, getNextChessman()), movingCooling, "cooling");
 		}
 		else {
 			changeTurn();
 		}
 	}
-	//放在下面是因为这个函数可能会changeTurn，而上面有turn的判断
-	ControllableGameScene::endMoving();
+	else {
+		ControllableGameScene::endMoving();
+	}
+
 }
 
 void PvaGameScene::changeTurn()
 {
 	ControllableGameScene::changeTurn();
 	if (turn == right) {
-		auto delayAction = DelayTime::create(movingCooling);
-		auto callingAction = CallFunc::create(CC_CALLBACK_0(PvaGameScene::AIMove, this));
-		auto delayAndCallingAction = Sequence::create(delayAction, callingAction, NULL);
-		this->runAction(delayAndCallingAction);
+		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "cooling");
 	}
 }
 

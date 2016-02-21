@@ -187,10 +187,8 @@ void GameScene::beginMoving(int col, Chessman chessman)
 		for (int j = 0; j < (turn == left ? rCol : lCol); j++) {
 			chessmanNode->getChildByTag(turn == left ? movingCol*rCol + j : j*rCol + movingCol)->runAction(movingAction->clone());
 		}
-		//把移动动作添加到新棋子的时候顺便加个调用动作
-		auto callingAction = CallFunc::create(CC_CALLBACK_0(GameScene::endMoving, this));
-		auto movingAndCallingAction = Sequence::create(movingAction, callingAction, NULL);
-		newChessman->runAction(movingAndCallingAction);
+		newChessman->runAction(movingAction->clone());
+		scheduleOnce(CC_CALLBACK_0(GameScene::endMoving, this), movingTime, "move");
 	}
 }
 

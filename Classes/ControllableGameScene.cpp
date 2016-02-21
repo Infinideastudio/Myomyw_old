@@ -60,10 +60,7 @@ void ControllableGameScene::endMoving()
 				changeTurn();
 			}
 			else {
-				auto delayAction = DelayTime::create(movingCooling);
-				auto callingAction = CallFunc::create(CC_CALLBACK_0(ControllableGameScene::beginMoving, this, movingCol, getNextChessman()));
-				auto delayAndCallingAction = Sequence::create(delayAction, callingAction, NULL);
-				this->runAction(delayAndCallingAction);
+				scheduleOnce(CC_CALLBACK_0(ControllableGameScene::beginMoving, this, movingCol, getNextChessman()), movingCooling, "cooling");
 			}
 		}
 		else {
