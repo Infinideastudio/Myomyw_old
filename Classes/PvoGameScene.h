@@ -4,6 +4,7 @@
 #include "network\SocketIO.h"
 #include "Json.h"
 
+USING_NS_CC;
 using namespace cocos2d::network;
 
 class PvoGameScene :public ControllableGameScene, public SocketIO::SIODelegate
@@ -13,6 +14,8 @@ public:
 	static PvoGameScene* create(std::string address);
 	~PvoGameScene();
 private:
+	Label* roomLabel;
+
 	cocos2d::network::SIOClient* client;
 	bool disconnected = false;
 	bool shouldChangeTurn = false;

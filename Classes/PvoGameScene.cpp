@@ -7,6 +7,11 @@ bool PvoGameScene::init(std::string address)
 {
 	if (!ControllableGameScene::init())
 		return false;
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	roomLabel = Label::createWithTTF(XmlData::text["waiting"], "fonts/Deng.ttf", 25);
+	roomLabel->setTextColor(Color4B(0, 0, 0, 255));
+	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, visibleSize.height - roomLabel->getContentSize().height);
+	this->addChild(roomLabel);
 
 	client = SocketIO::connect(address, *this);
 	if (!client)
@@ -115,6 +120,7 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 		changeTurn();
 	}
 	room = j.getInt("room");
+	roomLabel->setString(XmlData::text["room"] + std::to_string(room));
 }
 
 void PvoGameScene::onTellNewChessman(SIOClient * client, const std::string & data)
