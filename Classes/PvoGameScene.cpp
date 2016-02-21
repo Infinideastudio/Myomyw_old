@@ -101,7 +101,7 @@ void PvoGameScene::rightWins()
 
 void PvoGameScene::onError(SIOClient * client, const std::string & data)
 {
-	MessageBox(("onError!" + data).c_str(), "Myomyw");
+	MessageBox(("Error! " + data).c_str(), "Myomyw");
 	Director::getInstance()->replaceScene(MainScene::create());
 }
 
@@ -143,12 +143,15 @@ void PvoGameScene::onEndGame(SIOClient * client, const std::string & data)
 {
 	Json j(data);
 	endGameReason = (EndGameReason)j.getInt("reason");
-	if (endGameReason == unknown || endGameReason == opponentLeft) {
-		Director::getInstance()->replaceScene(MainScene::create());
+	if (endGameReason == opponentLeft) {
+		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["opponent left"], Color4B(0, 0, 0, 255)));
 	}
 }
 
 void PvoGameScene::onDisconnected(SIOClient * client, const std::string & data)
 {
+	if (endGameReason == unknown) {
+		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["unknown disconnect"], Color4B(0, 0, 0, 255)));
+	}
 	disconnected = true;
 }
