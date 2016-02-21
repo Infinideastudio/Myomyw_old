@@ -109,7 +109,9 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 {
 	started = true;
 	Json j(data);
-	turn = j.getInt("side") == 0 ? left : right;
+	if (j.getInt("side") == right) {
+		changeTurn();
+	}
 	room = j.getInt("room");
 }
 
