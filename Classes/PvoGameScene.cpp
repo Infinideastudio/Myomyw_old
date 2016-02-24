@@ -8,7 +8,7 @@ bool PvoGameScene::init(std::string address)
 	if (!ControllableGameScene::init())
 		return false;
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel = Label::createWithTTF(XmlData::text["waiting"], "fonts/Deng.ttf", 25);
+	roomLabel = Label::createWithTTF(XmlData::text["connecting"], "fonts/Deng.ttf", 25);
 	roomLabel->setTextColor(Color4B(0, 0, 0, 255));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, visibleSize.height - roomLabel->getContentSize().height);
 	this->addChild(roomLabel);
@@ -16,7 +16,7 @@ bool PvoGameScene::init(std::string address)
 	client = SocketIO::connect(address, *this);
 	if (!client)
 		return false;
-	client->on("connect", [](SIOClient* client, const std::string &data) {});
+	client->on("connect", CC_CALLBACK_2(PvoGameScene::onConnect, this));
 	client->on("start", CC_CALLBACK_2(PvoGameScene::onStart, this));
 	client->on("tellNewChessman", CC_CALLBACK_2(PvoGameScene::onTellNewChessman, this));
 	client->on("beginMoving", CC_CALLBACK_2(PvoGameScene::onBeginMoving, this));
@@ -104,6 +104,11 @@ void PvoGameScene::rightWins()
 		auto rs = ResultScene::create(XmlData::text["online player wins"], Color4B(0, 0, 0, 255));
 		Director::getInstance()->replaceScene(rs);
 	}
+}
+
+void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
+{
+	roomLabel->setString(XmlData::text["waiting"]);
 }
 
 void PvoGameScene::onError(SIOClient * client, const std::string & data)

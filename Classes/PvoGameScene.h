@@ -31,6 +31,7 @@ private:
 	void leftWins();
 	void rightWins();
 
+	void onConnect(SIOClient* client, const std::string &data);
 	void onError(SIOClient* client, const std::string &data);
 	void onClose(SIOClient* client) {};
 	void onStart(SIOClient* client, const std::string &data);

@@ -43,8 +43,13 @@ void ControllableGameScene::activateEjector(int col)
 void ControllableGameScene::beginMoving(int col, Chessman chessman)
 {
 	if (moveByTouching) {
-		GameScene::beginMoving(col, chessman);
-		totalMovementTimes++;
+		if (holdingTouching) {
+			GameScene::beginMoving(col, chessman);
+			totalMovementTimes++;
+		}
+		else {
+			changeTurn();
+		}
 	}
 	else {
 		GameScene::beginMoving(col, chessman);

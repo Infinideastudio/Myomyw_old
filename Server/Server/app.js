@@ -1,6 +1,5 @@
 ﻿var players = new Object();
 var rooms = new Array();
-var newChessman;
 
 const defaultLCol = 5, defaultRCol = 5;
 const maxLCol = 10, maxRCol = 10;
@@ -36,8 +35,9 @@ io.on('connection', function (socket) {
             players[socket.id] = i;
             rooms[i].rightPlayer = socket;
             rooms[i].leftPlayer.emit("start", { side: left, room: i });
-            newChessman = getRandomChessman();
-            rooms[i].leftPlayer.emit('tellNewChessman', { chessman: newChessman });
+            rooms[i].newChessman = getRandomChessman();
+            rooms[i].leftPlayer.emit('tellNewChessman', { chessman: rooms[i].newChessman });
+            console.log('tell ' + rooms[i].newChessman);
             rooms[i].rightPlayer.emit("start", { side: right, room: i });
             rooms[i].state = playing;
             break;
@@ -55,19 +55,19 @@ io.on('connection', function (socket) {
         if (data.col == undefined) { return; }
         var room = rooms[players[socket.id]];
         if (room.currentPlayer().id == socket.id) {
-            console.log('beginMoving ' + JSON.stringify(data) + "   " + room.turn + "   " + socket.id);
+            console.log('beginMoving ' + JSON.stringify(data) + "   " + room.newChessman + "   " + room.turn + "   " + socket.id);
             if (!room.movingCol) {
                 room.movingCol = data.col;
             }
             if (room.movingCol == data.col) {
                 if (room.totalMovementTimes < maxMovementTimes) {
                     room.totalMovementTimes++;
-                    var result = room.move(data.col, newChessman);
-                    room.waitingPlayer().emit('beginMoving', { col: data.col, chessman: newChessman });
-                    newChessman = getRandomChessman();
-                    room.currentPlayer().emit('tellNewChessman', { chessman: newChessman });
+                    var result = room.move(data.col, room.newChessman);
+                    room.waitingPlayer().emit('beginMoving', { col: data.col, chessman: room.newChessman });
+                    room.newChessman = getRandomChessman();
+                    console.log('tell ' + room.newChessman);
+                    room.currentPlayer().emit('tellNewChessman', { chessman: room.newChessman });
                     if (result != nothing) {
-                        room.state = over;
                         if (result == leftWins) {
                             room.leftPlayer.emit('endGame', { reason: youWin });
                             room.rightPlayer.emit('endGame', { reason: youLose });
@@ -81,8 +81,9 @@ io.on('connection', function (socket) {
                 } else {
                     room.currentPlayer().emit('changeTurn');
                     room.waitingPlayer().emit('changeTurn');
-                    newChessman = getRandomChessman();
-                    room.waitingPlayer().emit('tellNewChessman', { chessman: newChessman });
+                    room.newChessman = getRandomChessman();
+                    console.log('tell ' + room.newChessman);
+                    room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
                     room.changeTurn();
                     room.movingCol = null;
                     room.totalMovementTimes = 0;
@@ -94,10 +95,13 @@ io.on('connection', function (socket) {
 
     socket.on('changeTurn', function () {
         var room = rooms[players[socket.id]];
-        if (room.currentPlayer().id == socket.id) {
+        if (room.currentPlayer().id == socket.id && room.totalMovementTimes > 0) {
             room.waitingPlayer().emit('changeTurn');
-            newChessman = getRandomChessman();
-            room.waitingPlayer().emit('tellNewChessman', { chessman: newChessman });
+            if (room.firstTuringChange) {
+                room.newChessman = getRandomChessman();
+                console.log('tell ' + room.newChessman);
+                room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
+            }
             room.changeTurn();
             room.movingCol = null;
             room.totalMovementTimes = 0;
@@ -112,7 +116,8 @@ io.on('connection', function (socket) {
         if (room.state == playing) {
             if (room.leftPlayer.id == socket.id) {
                 room.rightPlayer.emit('endGame', { reason: opponentLeft });
-            } else {
+            }
+            if (room.rightPlayer.id == socket.id) {
                 room.leftPlayer.emit('endGame', { reason: opponentLeft });
             }
         }
@@ -122,7 +127,8 @@ io.on('connection', function (socket) {
 
 function closeRoom(id) {
     var room = rooms[id];
-    if (room) {
+    if (room && room.state != over) {
+        room.state = over;
         if (room.leftPlayer) {
             room.leftPlayer.disconnect();
             delete players[room.leftPlayer.id];
@@ -131,12 +137,13 @@ function closeRoom(id) {
             room.rightPlayer.disconnect();
             delete players[room.rightPlayer.id];
         }
+
         //删除房间（没有从数组里删除）
         delete rooms[id];
         //如果房间位于结尾，则从数组里删除此房间，并向后删除可删除的房间
         if (id == rooms.length - 1) {
-            var i = rooms.length - 1;
-            while (room[i]) {
+            var i = id;
+            while (i >= 0 && !rooms[i--]) {
                 rooms.pop();
             }
         }
@@ -163,6 +170,8 @@ function Room() {
     this.turn = left;
     this.lCol = defaultLCol;
     this.rCol = defaultRCol;
+    this.firstTuringChange = true;
+    this.newChessman;
     this.chessmen = new Array();
     for (var i = 0; i < maxLCol; i++) {
         this.chessmen[i] = new Array();
@@ -180,7 +189,7 @@ function Room() {
             for (var i = this.rCol - 1; i > 0; i--) {
                 this.chessmen[col][i] = this.chessmen[col][i - 1];
             }
-            this.chessmen[col][0] = newChessman;
+            this.chessmen[col][0] = this.newChessman;
             switch (lastChessman) {
                 case key:
                     return rightWins;
@@ -198,7 +207,7 @@ function Room() {
             for (var i = this.lCol - 1; i > 0; i--) {
                 this.chessmen[i][col] = this.chessmen[i - 1][col];
             }
-            this.chessmen[0][col] = newChessman;
+            this.chessmen[0][col] = this.newChessman;
             switch (lastChessman) {
                 case key:
                     return leftWins;
@@ -239,6 +248,7 @@ function Room() {
 
     this.changeTurn = function () {
         this.turn = this.turn == left ? right : left;
+        this.firstTuringChange = false;
     }
 
     this.currentPlayer = function () {
