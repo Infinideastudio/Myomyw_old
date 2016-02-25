@@ -10,7 +10,7 @@ bool GameScene::init()
 	//--初始化棋子数组--//
 	for (int i = 0; i < maxLCol; i++) {
 		for (int j = 0; j < maxRCol; j++) {
-			chessmen[i][j] = common;
+			chessmen[i][j] = Chessman::common;
 		}
 	}
 	Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -48,14 +48,14 @@ bool GameScene::setBoardSize(int lCol, int rCol)
 	if (this->lCol < lCol) {
 		for (int i = this->lCol; i < lCol; i++) {
 			for (int j = 0; j < rCol; j++) {
-				chessmen[i][j] = common;
+				chessmen[i][j] = Chessman::common;
 			}
 		}
 	}
 	if (this->rCol < rCol) {
 		for (int i = 0; i < lCol; i++) {
 			for (int j = this->rCol; j < rCol; j++) {
-				chessmen[i][j] = common;
+				chessmen[i][j] = Chessman::common;
 			}
 		}
 	}
@@ -155,16 +155,16 @@ Sprite * GameScene::createSpriteByChessman(Chessman type)
 {
 	std::string filename;
 	switch (type) {
-	case common:
+	case Chessman::common:
 		filename = "CommonChessman.png";
 		break;
-	case key:
+	case Chessman::key:
 		filename = "KeyChessman.png";
 		break;
-	case addCol:
+	case Chessman::addCol:
 		filename = "AddcolChessman.png";
 		break;
-	case delCol:
+	case Chessman::delCol:
 		filename = "DelcolChessman.png";
 		break;
 	}
@@ -203,13 +203,13 @@ void GameScene::endMoving()
 		}
 		chessmen[movingCol][0] = movingNewChessman;
 		switch (lastChessman) {
-		case key:
+		case Chessman::key:
 			rightWins();
 			break;
-		case addCol:
+		case Chessman::addCol:
 			setBoardSize(lCol, rCol + 1);
 			break;
-		case delCol:
+		case Chessman::delCol:
 			setBoardSize(lCol, rCol - 1);
 			break;
 		}
@@ -221,13 +221,13 @@ void GameScene::endMoving()
 		}
 		chessmen[0][movingCol] = movingNewChessman;
 		switch (lastChessman) {
-		case key:
+		case Chessman::key:
 			leftWins();
 			break;
-		case addCol:
+		case Chessman::addCol:
 			setBoardSize(lCol + 1, rCol);
 			break;
-		case delCol:
+		case Chessman::delCol:
 			setBoardSize(lCol - 1, rCol);
 			break;
 		}

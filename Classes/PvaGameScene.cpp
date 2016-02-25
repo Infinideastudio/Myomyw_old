@@ -65,17 +65,17 @@ void PvaGameScene::AIMove()
 		for (int j = 0; j < lCol; j++) {
 			float change = 0;
 			switch (chessmen[j][i]) {
-			case key:
+			case Chessman::key:
 				//对最下面一列的红球给予特别特别关注
 				if (j == lCol - 1)
 					change = -6;
 				else
 					change = -3;
 				break;
-			case addCol:
+			case Chessman::addCol:
 				change = -1;
 				break;
-			case delCol:
+			case Chessman::delCol:
 				change = 1;
 				break;
 			}

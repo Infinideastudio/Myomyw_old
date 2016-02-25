@@ -88,12 +88,12 @@ Chessman ControllableGameScene::getNextChessman()
 	switch (rand() % 10)
 	{
 	case 0:
-		return key;
+		return Chessman::key;
 	case 1:
-		return addCol;
+		return Chessman::addCol;
 	case 2:
-		return delCol;
+		return Chessman::delCol;
 	default:
-		return common;
+		return Chessman::common;
 	}
 }

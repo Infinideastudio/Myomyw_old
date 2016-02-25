@@ -92,7 +92,7 @@ Chessman PvoGameScene::getNextChessman()
 
 void PvoGameScene::leftWins()
 {
-	if (endGameReason == youWin) {
+	if (endGameReason == EndGameReason::youWin) {
 		auto rs = ResultScene::create(XmlData::text["player wins"], Color4B(0, 255, 0, 255));
 		Director::getInstance()->replaceScene(rs);
 	}
@@ -100,7 +100,7 @@ void PvoGameScene::leftWins()
 
 void PvoGameScene::rightWins()
 {
-	if (endGameReason == youLose) {
+	if (endGameReason == EndGameReason::youLose) {
 		auto rs = ResultScene::create(XmlData::text["online player wins"], Color4B(0, 0, 0, 255));
 		Director::getInstance()->replaceScene(rs);
 	}
@@ -159,14 +159,14 @@ void PvoGameScene::onEndGame(SIOClient * client, const std::string & data)
 {
 	Json j(data);
 	endGameReason = (EndGameReason)j.getInt("reason");
-	if (endGameReason == opponentLeft) {
+	if (endGameReason == EndGameReason::opponentLeft) {
 		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["opponent left"], Color4B(0, 0, 0, 255)));
 	}
 }
 
 void PvoGameScene::onDisconnected(SIOClient * client, const std::string & data)
 {
-	if (endGameReason == unknown) {
+	if (endGameReason == EndGameReason::unknown) {
 		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["unknown disconnect"], Color4B(0, 0, 0, 255)));
 	}
 	disconnected = true;
