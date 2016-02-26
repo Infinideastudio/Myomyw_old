@@ -39,7 +39,7 @@ void PvaGameScene::changeTurn()
 {
 	ControllableGameScene::changeTurn();
 	if (turn == right) {
-		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "cooling");
+		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "changing");
 	}
 }
 
