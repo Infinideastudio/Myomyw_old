@@ -17,7 +17,7 @@ bool MainScene::init()
 	auto pvpItem = MenuItemLabel::create(pvpLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvpGameScene::create()); });
 	pvpItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
-	
+
 	auto pvaLabel = Label::createWithTTF(XmlData::text["pva"], "fonts/Deng.ttf", 32);
 	pvaLabel->setTextColor(Color4B(0, 0, 0, 255));
 	auto pvaItem = MenuItemLabel::create(pvaLabel, [](Ref* pSender)
@@ -38,6 +38,12 @@ bool MainScene::init()
 	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 150));
 	addressBox->setPlaceHolder(XmlData::text["enter address"].c_str());
 	this->addChild(addressBox);
+
+	auto versionLabel = Label::createWithTTF(XmlData::text["version"], "fonts/Deng.ttf", 25);
+	versionLabel->setTextColor(Color4B(0, 0, 0, 255));
+	versionLabel->setPosition(visibleSize.width - versionLabel->getContentSize().width / 2, versionLabel->getContentSize().height / 2);
+	this->addChild(versionLabel);
+
 	return true;
 }
 

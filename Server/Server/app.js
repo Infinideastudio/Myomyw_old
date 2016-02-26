@@ -37,7 +37,6 @@ io.on('connection', function (socket) {
             rooms[i].leftPlayer.emit("start", { side: left, room: i });
             rooms[i].newChessman = getRandomChessman();
             rooms[i].leftPlayer.emit('tellNewChessman', { chessman: rooms[i].newChessman });
-            console.log('tell ' + rooms[i].newChessman);
             rooms[i].rightPlayer.emit("start", { side: right, room: i });
             rooms[i].state = playing;
             break;
@@ -65,7 +64,6 @@ io.on('connection', function (socket) {
                     var result = room.move(data.col, room.newChessman);
                     room.waitingPlayer().emit('beginMoving', { col: data.col, chessman: room.newChessman });
                     room.newChessman = getRandomChessman();
-                    console.log('tell ' + room.newChessman);
                     room.currentPlayer().emit('tellNewChessman', { chessman: room.newChessman });
                     if (result != nothing) {
                         if (result == leftWins) {
@@ -82,7 +80,6 @@ io.on('connection', function (socket) {
                     room.currentPlayer().emit('changeTurn');
                     room.waitingPlayer().emit('changeTurn');
                     room.newChessman = getRandomChessman();
-                    console.log('tell ' + room.newChessman);
                     room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
                     room.changeTurn();
                     room.movingCol = null;
@@ -99,7 +96,6 @@ io.on('connection', function (socket) {
             room.waitingPlayer().emit('changeTurn');
             if (room.firstTuringChange) {
                 room.newChessman = getRandomChessman();
-                console.log('tell ' + room.newChessman);
                 room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
             }
             room.changeTurn();
