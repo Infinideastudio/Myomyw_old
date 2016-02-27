@@ -12,6 +12,7 @@ protected:
 	bool holdingTouching = false;//发射器是否保持按下
 	int totalMovementTimes = 0;//总共的移动次数
 	bool moveByTouching = false;//按下发射器引发的移动
+	bool cooling = false;
 
 	bool ejectorTouchBeganCallback(Touch* touch, Event* event);
 	void ejectorTouchEndedCallback(Touch* touch, Event* event);
