@@ -2,13 +2,14 @@
 #include "XmlData.h"
 #include "ResultScene.h"
 #include "MainScene.h"
+#include "ResFiles.h"
 
 bool PvoGameScene::init(std::string address)
 {
 	if (!ControllableGameScene::init())
 		return false;
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel = Label::createWithTTF(XmlData::text["connecting"], "fonts/Deng.ttf", 25);
+	roomLabel = Label::createWithTTF(XmlData::text["connecting"], normalFont, 25);
 	roomLabel->setTextColor(Color4B(0, 0, 0, 255));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, visibleSize.height - roomLabel->getContentSize().height);
 	this->addChild(roomLabel);

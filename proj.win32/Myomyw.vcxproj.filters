@@ -84,6 +84,9 @@
     <ClInclude Include="..\Classes\Json.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\ResFiles.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
