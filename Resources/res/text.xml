@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dict>
-  <p key="version" value="Version 0.1"/>
+  <p key="version" value="Alpha 0.1.1"/>
   <p key="pvp" value="单机双人"/>
   <p key="pva" value="人机对战"/>
   <p key="pvo" value="网络对战"/>
