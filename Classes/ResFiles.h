@@ -19,4 +19,6 @@ delColChessman = chessmanDir + "DelCol.png",
 
 ejectorDir = resDir + "Ejector/",
 blueEjector = ejectorDir + "Blue.png",
-greenEjector = ejectorDir + "Green.png";
+greenEjector = ejectorDir + "Green.png",
+
+textFile = resDir + "text.xml";
