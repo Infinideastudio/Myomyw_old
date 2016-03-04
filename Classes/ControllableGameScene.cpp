@@ -16,10 +16,13 @@ bool ControllableGameScene::init()
 bool ControllableGameScene::ejectorTouchBeganCallback(Touch* touch, Event* event)
 {
 	for (int i = 0; i < (turn == left ? lCol : rCol); i++) {
+		//判断鼠标是否处于发射器内(45°倾斜的正方形)
 		Vec2 point = touch->getLocation() - ejectorNode->getChildByTag(turn == left ? i : lCol + i)->getPosition();
 		if (point.x + point.y<halfDiagonal && point.x + point.y>-halfDiagonal && point.x - point.y>-halfDiagonal && point.y - point.x > -halfDiagonal) {
-			holdingTouching = true;
-			activateEjector(i);
+			if (!moving && !cooling) {
+				holdingTouching = true;
+				activateEjector(i);
+			}
 		}
 	}
 	return true;//true表示在这里接收moved和ended事件
@@ -30,16 +33,15 @@ void ControllableGameScene::ejectorTouchEndedCallback(Touch* touch, Event* event
 	holdingTouching = false;
 	if (moveByTouching && cooling) {
 		cooling = false;
+		unschedule("cooling");
 		changeTurn();
 	}
 }
 
 void ControllableGameScene::activateEjector(int col)
 {
-	if (!moving && !cooling) {
-		moveByTouching = true;
-		beginMoving(col, getNextChessman());
-	}
+	moveByTouching = true;
+	beginMoving(col, getNextChessman());
 }
 
 void ControllableGameScene::beginMoving(int col, Chessman chessman)
