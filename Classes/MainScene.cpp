@@ -13,20 +13,25 @@ bool MainScene::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+	auto background = Sprite::create(mainSceneBackground);
+	background->setPosition(visibleSize / 2);
+	this->addChild(background);
+
 	auto pvpLabel = Label::createWithTTF(XmlData::text["pvp"], normalFont, 32);
-	pvpLabel->setTextColor(Color4B(0, 0, 0, 255));
+	pvpLabel->setTextColor(Color4B(30, 100, 30, 255));
+	pvpLabel->setColor(Color3B(0, 250, 60));
 	auto pvpItem = MenuItemLabel::create(pvpLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvpGameScene::create()); });
 	pvpItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
 
 	auto pvaLabel = Label::createWithTTF(XmlData::text["pva"], normalFont, 32);
-	pvaLabel->setTextColor(Color4B(0, 0, 0, 255));
+	pvaLabel->setTextColor(Color4B(30, 100, 30, 255));
 	auto pvaItem = MenuItemLabel::create(pvaLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvaGameScene::create());  });
 	pvaItem->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 
 	auto pvoLabel = Label::createWithTTF(XmlData::text["pvo"], normalFont, 32);
-	pvoLabel->setTextColor(Color4B(0, 0, 0, 255));
+	pvoLabel->setTextColor(Color4B(30, 100, 30, 255));
 	auto pvoItem = MenuItemLabel::create(pvoLabel, CC_CALLBACK_1(MainScene::pvoItemCallback, this));
 	pvoItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 100);
 
@@ -38,6 +43,7 @@ bool MainScene::init()
 	addressBox->setFontColor(Color4B(0, 0, 0, 255));
 	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 150));
 	addressBox->setPlaceHolder(XmlData::text["enter address"].c_str());
+	addressBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
 	this->addChild(addressBox);
 
 	auto versionLabel = Label::createWithTTF(XmlData::text["version"], normalFont, 25);
