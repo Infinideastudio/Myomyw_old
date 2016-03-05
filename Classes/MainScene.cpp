@@ -39,7 +39,7 @@ bool MainScene::init()
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu);
 
-	addressBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1, 1, 1, 1), editBox));
+	addressBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), editBox));
 	addressBox->setFontColor(Color4B(0, 0, 0, 255));
 	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 150));
 	addressBox->setPlaceHolder(XmlData::text["enter address"].c_str());
