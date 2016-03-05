@@ -7,6 +7,7 @@ fontDir = resDir + "fonts/",
 normalFont = fontDir + "Deng.ttf",
 
 uiDir = resDir + "UI/",
+mainSceneBackground = uiDir + "MainScene.png",
 editBox = uiDir + "EditBox.png",
 backNormal = uiDir + "BackNormal.png",
 backSelected = uiDir + "BackSelected.png",
