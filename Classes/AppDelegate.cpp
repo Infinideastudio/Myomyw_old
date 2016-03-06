@@ -50,7 +50,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	director->setDisplayStats(false);
 #endif
 
-
 	// set FPS. the default value is 1.0/60 if you don't call this
 	director->setAnimationInterval(1.0f / 60);
 
@@ -61,7 +60,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	register_all_packages();
 
+	std::vector<std::string> searchPaths;
+	searchPaths.push_back("res/");
+	FileUtils::getInstance()->setSearchPaths(searchPaths);
 	srand(unsigned(time(0)));
+	
 	XmlData::init();
 
 	auto scene = MainScene::create();

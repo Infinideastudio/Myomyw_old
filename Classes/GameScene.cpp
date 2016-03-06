@@ -2,8 +2,8 @@
 #include "XmlData.h"
 #include "ResultScene.h"
 #include "MainScene.h"
-#include "ResFiles.h"
 USING_NS_CC;
+
 bool GameScene::init()
 {
 	if (!Scene::init())
@@ -16,7 +16,7 @@ bool GameScene::init()
 	}
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	//--·µ»Ø°´Å¥--//
-	auto backItem = MenuItemImage::create(backNormal, backSelected, [](Ref* pSender)
+	auto backItem = MenuItemImage::create("UI/BackNormal.png", "UI/BackSelected.png", [](Ref* pSender)
 	{Director::getInstance()->replaceScene(MainScene::create()); });
 	backItem->setPosition(Vec2(backItem->getContentSize().width / 2 + 10, visibleSize.height - backItem->getContentSize().height / 2 - 10));
 	auto menu = Menu::create(backItem, NULL);
@@ -118,7 +118,7 @@ void GameScene::buildChessboard()
 	ejectorNode->removeAllChildren();
 	for (int i = 0; i < drawLCol - 1; i++)
 	{
-		auto ejector = Sprite::create(greenEjector);
+		auto ejector = Sprite::create("Ejector/Green.png");
 		ejector->setPosition(Vec2(topVertex.x - (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
 		ejector->setScaleX(diagonal / ejector->getContentSize().width);
 		ejector->setScaleY(diagonal / ejector->getContentSize().height);
@@ -127,7 +127,7 @@ void GameScene::buildChessboard()
 	}
 	for (int i = 0; i < drawRCol - 1; i++)
 	{
-		auto ejector = Sprite::create(blueEjector);
+		auto ejector = Sprite::create("Ejector/Blue.png");
 		ejector->setPosition(Vec2(topVertex.x + (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
 		ejector->setScaleX(diagonal / ejector->getContentSize().width);
 		ejector->setScaleY(diagonal / ejector->getContentSize().height);
@@ -157,16 +157,16 @@ Sprite * GameScene::createSpriteByChessman(Chessman type)
 	std::string filename;
 	switch (type) {
 	case Chessman::common:
-		filename = commonChessman;
+		filename = "Chessman/Common.png";
 		break;
 	case Chessman::key:
-		filename = keyChessman;
+		filename = "Chessman/Key.png";
 		break;
 	case Chessman::addCol:
-		filename = addColChessman;
+		filename = "Chessman/AddCol.png";
 		break;
 	case Chessman::delCol:
-		filename = delColChessman;
+		filename = "Chessman/DelCol.png";
 		break;
 	}
 	auto chessman = Sprite::create(filename);
