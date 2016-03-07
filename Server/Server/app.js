@@ -94,10 +94,8 @@ io.on('connection', function (socket) {
         var room = rooms[players[socket.id]];
         if (room.currentPlayer().id == socket.id && room.totalMovementTimes > 0) {
             room.waitingPlayer().emit('changeTurn');
-            if (room.firstTuringChange) {
-                room.newChessman = getRandomChessman();
-                room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
-            }
+            room.newChessman = getRandomChessman();
+            room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
             room.changeTurn();
             room.movingCol = null;
             room.totalMovementTimes = 0;
@@ -166,7 +164,6 @@ function Room() {
     this.turn = left;
     this.lCol = defaultLCol;
     this.rCol = defaultRCol;
-    this.firstTuringChange = true;
     this.newChessman;
     this.chessmen = new Array();
     for (var i = 0; i < maxLCol; i++) {
@@ -244,7 +241,6 @@ function Room() {
 
     this.changeTurn = function () {
         this.turn = this.turn == left ? right : left;
-        this.firstTuringChange = false;
     }
 
     this.currentPlayer = function () {
