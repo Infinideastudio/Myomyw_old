@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
 #include "MainScene.h"
-#include "XmlData.h"
+#include "Text.h"
 USING_NS_CC;
 
 static const cocos2d::Size designResolutionSize = cocos2d::Size(600, 600);
@@ -65,7 +65,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	FileUtils::getInstance()->setSearchPaths(searchPaths);
 	srand(unsigned(time(0)));
 	
-	XmlData::init();
+	Text::loadLang("zh_CN");
 
 	auto scene = MainScene::create();
 

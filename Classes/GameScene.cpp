@@ -1,5 +1,5 @@
 #include "GameScene.h"
-#include "XmlData.h"
+#include "Text.h"
 #include "ResultScene.h"
 #include "MainScene.h"
 USING_NS_CC;
@@ -244,12 +244,12 @@ void GameScene::changeTurn()
 
 void GameScene::leftWins()
 {
-	auto rs = ResultScene::create(XmlData::text["green wins"], Color4B(0, 255, 0, 255));
+	auto rs = ResultScene::create(Text::get("greenWins"), Color4B(0, 255, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void GameScene::rightWins()
 {
-	auto rs = ResultScene::create(XmlData::text["blue wins"], Color4B(0, 0, 255, 255));
+	auto rs = ResultScene::create(Text::get("blueWins"), Color4B(0, 0, 255, 255));
 	Director::getInstance()->replaceScene(rs);
 }

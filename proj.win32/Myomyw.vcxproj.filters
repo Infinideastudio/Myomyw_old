@@ -28,9 +28,6 @@
     <ClCompile Include="..\Classes\ResultScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\XmlData.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\PvpGameScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -44,6 +41,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Json.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Text.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,9 +66,6 @@
     <ClInclude Include="..\Classes\ResultScene.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\XmlData.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\PvpGameScene.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -82,6 +79,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Json.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Text.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

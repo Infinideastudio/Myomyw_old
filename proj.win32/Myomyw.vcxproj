@@ -154,7 +154,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\PvoGameScene.cpp" />
     <ClCompile Include="..\Classes\PvpGameScene.cpp" />
     <ClCompile Include="..\Classes\ResultScene.cpp" />
-    <ClCompile Include="..\Classes\XmlData.cpp" />
+    <ClCompile Include="..\Classes\Text.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,7 +168,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\PvoGameScene.h" />
     <ClInclude Include="..\Classes\PvpGameScene.h" />
     <ClInclude Include="..\Classes\ResultScene.h" />
-    <ClInclude Include="..\Classes\XmlData.h" />
+    <ClInclude Include="..\Classes\Text.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>

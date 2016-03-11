@@ -1,5 +1,5 @@
 #include "PvoGameScene.h"
-#include "XmlData.h"
+#include "Text.h"
 #include "ResultScene.h"
 #include "MainScene.h"
 
@@ -8,7 +8,7 @@ bool PvoGameScene::init(std::string address)
 	if (!ControllableGameScene::init())
 		return false;
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel = Label::createWithTTF(XmlData::text["connecting"], "fonts/Deng.ttf", 25);
+	roomLabel = Label::createWithTTF(Text::get("connecting"), "fonts/Deng.ttf", 25);
 	roomLabel->setTextColor(Color4B(0, 0, 0, 255));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, visibleSize.height - roomLabel->getContentSize().height);
 	this->addChild(roomLabel);
@@ -93,7 +93,7 @@ Chessman PvoGameScene::getNextChessman()
 void PvoGameScene::leftWins()
 {
 	if (endGameReason == EndGameReason::youWin) {
-		auto rs = ResultScene::create(XmlData::text["player wins"], Color4B(0, 255, 0, 255));
+		auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
 		Director::getInstance()->replaceScene(rs);
 	}
 }
@@ -101,14 +101,14 @@ void PvoGameScene::leftWins()
 void PvoGameScene::rightWins()
 {
 	if (endGameReason == EndGameReason::youLose) {
-		auto rs = ResultScene::create(XmlData::text["online player wins"], Color4B(0, 0, 0, 255));
+		auto rs = ResultScene::create(Text::get("onlinePlayerWins"), Color4B(0, 0, 0, 255));
 		Director::getInstance()->replaceScene(rs);
 	}
 }
 
 void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
 {
-	roomLabel->setString(XmlData::text["waiting"]);
+	roomLabel->setString(Text::get("waiting"));
 }
 
 void PvoGameScene::onError(SIOClient * client, const std::string & data)
@@ -125,7 +125,7 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 		changeTurn();
 	}
 	room = j.getInt("room");
-	roomLabel->setString(XmlData::text["room"] + std::to_string(room));
+	roomLabel->setString(Text::get("room") + std::to_string(room));
 }
 
 void PvoGameScene::onTellNewChessman(SIOClient * client, const std::string & data)
@@ -160,14 +160,14 @@ void PvoGameScene::onEndGame(SIOClient * client, const std::string & data)
 	Json j(data);
 	endGameReason = (EndGameReason)j.getInt("reason");
 	if (endGameReason == EndGameReason::opponentLeft) {
-		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["opponent left"], Color4B(0, 0, 0, 255)));
+		Director::getInstance()->replaceScene(ResultScene::create(Text::get("opponentLeft"), Color4B(0, 0, 0, 255)));
 	}
 }
 
 void PvoGameScene::onDisconnected(SIOClient * client, const std::string & data)
 {
 	if (endGameReason == EndGameReason::unknown) {
-		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["unknown disconnect"], Color4B(0, 0, 0, 255)));
+		Director::getInstance()->replaceScene(ResultScene::create(Text::get("unknownDisconnect"), Color4B(0, 0, 0, 255)));
 	}
 	disconnected = true;
 }

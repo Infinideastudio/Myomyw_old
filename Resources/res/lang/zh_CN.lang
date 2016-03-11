@@ -1,0 +1,16 @@
+version=Alpha 0.1.1
+pvp=单机双人
+pva=人机对战
+pvo=网络对战
+blueWins=蓝方胜利
+greenWins=绿方胜利
+playerWins=你赢了
+aiWins=电脑赢了
+onlinePlayerWins=对手赢了
+back=返回
+enterAddress=输入服务器地址
+connecting=连接中
+waiting=等待中
+room=房间
+unknownDisconnect=连接已断开，且服务器未指定原因
+opponentLeft=对手已离开
