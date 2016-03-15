@@ -17,7 +17,7 @@ bool ControllableGameScene::ejectorTouchBeganCallback(Touch* touch, Event* event
 {
 	for (int i = 0; i < (turn == left ? lCol : rCol); i++) {
 		//判断鼠标是否处于发射器内(45°倾斜的正方形)
-		Vec2 point = touch->getLocation() - ejectorNode->getChildByTag(turn == left ? i : lCol + i)->getPosition();
+		Vec2 point = ejectorNode->convertToNodeSpace(touch->getLocation()) - ejectorNode->getChildByTag(turn == left ? i : lCol + i)->getPosition();
 		if (point.x + point.y<halfDiagonal && point.x + point.y>-halfDiagonal && point.x - point.y>-halfDiagonal && point.y - point.x > -halfDiagonal) {
 			if (!moving && !cooling) {
 				holdingTouching = true;

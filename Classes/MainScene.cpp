@@ -10,10 +10,11 @@ bool MainScene::init()
 	if (!Scene::init())
 		return false;
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	auto background = Sprite::create("UI/MainScene.png");
-	background->setPosition(visibleSize / 2);
+	float scale = MAX(visibleSize.width / background->getContentSize().width, visibleSize.height / background->getContentSize().height);
+	background->setScale(scale);
+	background->setPosition(visibleSize.width / 2, visibleSize.height - background->getContentSize().height * scale * 0.5);
 	this->addChild(background);
 
 	auto pvpLabel = Label::createWithTTF(Text::get("pvp"), "fonts/Deng.ttf", 32);
