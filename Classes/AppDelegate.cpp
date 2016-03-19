@@ -71,8 +71,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	case LanguageType::ENGLISH:
 	default:
 		Text::loadLang("en_US");
+		break;
 	}
-
 
 	auto scene = MainScene::create();
 
