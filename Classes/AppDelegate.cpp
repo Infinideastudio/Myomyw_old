@@ -3,7 +3,7 @@
 #include "Text.h"
 USING_NS_CC;
 
-static const cocos2d::Size designResolutionSize = cocos2d::Size(800,600);
+static const cocos2d::Size designResolutionSize = cocos2d::Size(800, 600);
 
 AppDelegate::AppDelegate() {
 
@@ -64,8 +64,15 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	searchPaths.push_back("res/");
 	FileUtils::getInstance()->setSearchPaths(searchPaths);
 	srand(unsigned(time(0)));
+	switch (Application::getInstance()->getCurrentLanguage()) {
+	case LanguageType::CHINESE:
+		Text::loadLang("zh_CN");
+		break;
+	case LanguageType::ENGLISH:
+	default:
+		Text::loadLang("en_US");
+	}
 
-	Text::loadLang("zh_CN");
 
 	auto scene = MainScene::create();
 
