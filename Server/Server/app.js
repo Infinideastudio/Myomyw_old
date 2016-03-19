@@ -5,12 +5,13 @@ const defaultLCol = 5, defaultRCol = 5;
 const maxLCol = 10, maxRCol = 10;
 const minLCol = 3, minRCol = 3;
 const maxMovementTimes = 5;
-
+const timeLimit = 20000;//超时时间(ms)
+const MaxInterval = 30000;//两次移动之间的最大间隔(ms)
 const waiting = 0, playing = 1, over = 2;//房间状态
 const left = 0, right = 1;//左右侧
 const unknow = 0, common = 1, key = 2, addCol = 3, delCol = 4;//棋子种类
 const nothing = 0, leftWins = 1, rightWins = 2;//移动结果
-const opponentLeft = 1, youWin = 2, youLose = 3;//结束理由
+const opponentLeft = 1, youWin = 2, youLose = 3, timeOut = 4;//结束理由
 
 var io = require('socket.io').listen(8000);
 console.log('listening on port 8000');
@@ -24,6 +25,7 @@ io.on('connection', function (socket) {
         if (!rooms[i]) {
             found = true;
             rooms[i] = new Room();
+            rooms[i].id = i;
             rooms[i].leftPlayer = socket;
             players[socket.id] = i;
             break;
@@ -39,6 +41,7 @@ io.on('connection', function (socket) {
             rooms[i].leftPlayer.emit('tellNewChessman', { chessman: rooms[i].newChessman });
             rooms[i].rightPlayer.emit("start", { side: right, room: i });
             rooms[i].state = playing;
+            rooms[i].start();
             break;
         }
     }
@@ -46,7 +49,9 @@ io.on('connection', function (socket) {
     if (!found) {
         var room = new Room();
         room.leftPlayer = socket;
-        players[socket.id] = rooms.push(room) - 1;
+        var index = rooms.push(room) - 1;
+        players[socket.id] = index;
+        room.id = index;
     }
 
     socket.on('beginMoving', function (data) {
@@ -57,6 +62,15 @@ io.on('connection', function (socket) {
             console.log('beginMoving ' + JSON.stringify(data) + "   " + room.newChessman + "   " + room.turn + "   " + socket.id);
             if (!room.movingCol) {
                 room.movingCol = data.col;
+                clearTimeout(room.timeOutHandle);
+                room.timeOutHandle = setTimeout(function () {
+                    room.leftPlayer().emit('changeTurn');
+                    room.rightPlayer().emit('changeTurn');
+                    room.newChessman = getRandomChessman();
+                    room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
+                    room.changeTurn();
+                    console.log('changeTurn ' + room.turn);
+                }, MaxInterval);
             }
             if (room.movingCol == data.col) {
                 if (room.totalMovementTimes < maxMovementTimes) {
@@ -97,8 +111,6 @@ io.on('connection', function (socket) {
             room.newChessman = getRandomChessman();
             room.waitingPlayer().emit('tellNewChessman', { chessman: room.newChessman });
             room.changeTurn();
-            room.movingCol = null;
-            room.totalMovementTimes = 0;
             console.log('changeTurn ' + room.turn);
         }
     });
@@ -131,7 +143,8 @@ function closeRoom(id) {
             room.rightPlayer.disconnect();
             delete players[room.rightPlayer.id];
         }
-
+        //清除延时
+        clearTimeout(room.timeOutHandle);
         //删除房间（没有从数组里删除）
         delete rooms[id];
         //如果房间位于结尾，则从数组里删除此房间，并向后删除可删除的房间
@@ -158,13 +171,14 @@ function getRandomChessman() {
 }
 
 function Room() {
+    this.id = null;
     this.leftPlayer = null;
     this.rightPlayer = null;
     this.state = waiting;
     this.turn = left;
     this.lCol = defaultLCol;
     this.rCol = defaultRCol;
-    this.newChessman;
+    this.newChessman = null;
     this.chessmen = new Array();
     for (var i = 0; i < maxLCol; i++) {
         this.chessmen[i] = new Array();
@@ -174,6 +188,12 @@ function Room() {
     }
     this.movingCol = null;
     this.totalMovementTimes = 0;
+    this.timeOutHandle = null;
+
+    this.start = function () {
+        var _this = this;
+        this.timeOutHandle = setTimeout(function () { _this.timeOut() }, timeLimit);
+    }
 
     this.move = function (col, chessman) {
         var lastChessman;//暂存最底下的棋子
@@ -238,15 +258,27 @@ function Room() {
         return true;
     }
 
-
-    this.changeTurn = function () {
-        this.turn = this.turn == left ? right : left;
-    }
-
     this.currentPlayer = function () {
         return this.turn == left ? this.leftPlayer : this.rightPlayer
     }
+
     this.waitingPlayer = function () {
         return this.turn == left ? this.rightPlayer : this.leftPlayer
+    }
+
+    this.changeTurn = function () {
+        this.turn = this.turn == left ? right : left;
+        this.movingCol = null;
+        this.totalMovementTimes = 0;
+        clearTimeout(this.timeOutHandle);
+        var _this = this;
+        this.timeOutHandle = setTimeout(function () { _this.timeOut() }, timeLimit);
+    }
+
+    this.timeOut = function () {
+        var room = rooms[this.id];
+        this.leftPlayer.emit('endGame', { reason: timeOut });
+        this.rightPlayer.emit('endGame', { reason: timeOut });
+        closeRoom(this.id);
     }
 }
