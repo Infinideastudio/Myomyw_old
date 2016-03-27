@@ -54,7 +54,7 @@ bool MainScene::init()
 	auto easeAction = EaseBackOut::create(moveAction);
 	ui->runAction(easeAction);
 
-	auto versionLabel = Label::createWithTTF(Text::get("version"), "fonts/Deng.ttf", 25);
+	auto versionLabel = Label::createWithTTF("Alpha 0.2", "fonts/Deng.ttf", 25);
 	versionLabel->setTextColor(Color4B(0, 0, 0, 255));
 	versionLabel->setPosition(visibleSize.width - versionLabel->getContentSize().width / 2, versionLabel->getContentSize().height / 2);
 	this->addChild(versionLabel);
