@@ -17,6 +17,9 @@ bool MainScene::init()
 	background->setPosition(visibleSize.width / 2, visibleSize.height - background->getContentSize().height * scale * 0.5);
 	this->addChild(background);
 
+	auto ui = Layer::create();
+	this->addChild(ui);
+
 	auto pvpLabel = Label::createWithTTF(Text::get("pvp"), "fonts/Deng.ttf", 32);
 	pvpLabel->setTextColor(Color4B(30, 100, 30, 255));
 	pvpLabel->setColor(Color3B(0, 250, 60));
@@ -37,14 +40,19 @@ bool MainScene::init()
 
 	auto menu = Menu::create(pvpItem, pvaItem, pvoItem, NULL);
 	menu->setPosition(Vec2::ZERO);
-	this->addChild(menu);
+	ui->addChild(menu);
 
 	addressBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
 	addressBox->setFontColor(Color4B(0, 0, 0, 255));
 	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 150));
 	addressBox->setPlaceHolder(Text::get("enterAddress").c_str());
 	addressBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
-	this->addChild(addressBox);
+	ui->addChild(addressBox);
+
+	ui->setPosition(0, -ui->getContentSize().height);
+	auto moveAction = MoveTo::create(1, Vec2::ZERO);
+	auto easeAction = EaseBackOut::create(moveAction);
+	ui->runAction(easeAction);
 
 	auto versionLabel = Label::createWithTTF(Text::get("version"), "fonts/Deng.ttf", 25);
 	versionLabel->setTextColor(Color4B(0, 0, 0, 255));
