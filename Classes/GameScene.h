@@ -25,7 +25,10 @@ protected:
 	Node* ejectorNode;//放发射器的节点
 	Node* chessmanNode;//放棋子的节点(也就是裁切底板)
 	DrawNode* gridDrawNode;//网格绘制节点
+	Label* leftNameLabel;
+	Label* rightNameLabel;
 
+	void setNames(std::string left, std::string right);
 	bool setBoardSize(int lCol, int rCol);
 	virtual void setTurnFlag();
 	virtual void buildChessboard();

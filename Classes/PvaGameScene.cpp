@@ -6,6 +6,7 @@ bool PvaGameScene::init()
 {
 	if (!ControllableGameScene::init())
 		return false;
+	setNames(Text::get("me"), Text::get("machine"));
 	return true;
 }
 

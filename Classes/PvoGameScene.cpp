@@ -10,10 +10,11 @@ bool PvoGameScene::init(std::string address)
 	timer = LayerColor::create();
 	if (!ControllableGameScene::init())
 		return false;
+	setNames(Text::get("me"), Text::get("opponent"));
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	roomLabel = Label::createWithTTF(Text::get("connecting"), "fonts/Deng.ttf", 25);
 	roomLabel->setTextColor(Color4B(0, 0, 0, 255));
-	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, visibleSize.height - roomLabel->getContentSize().height);
+	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
 	this->addChild(roomLabel);
 
 	timerStencil = ClippingNode::create(timerStencilDrawNode);
@@ -122,7 +123,7 @@ void PvoGameScene::changeTurn()
 	}
 	ControllableGameScene::changeTurn();
 	time = timeLimit;
-	
+
 	startTimer();
 }
 
@@ -149,7 +150,10 @@ void PvoGameScene::rightWins()
 
 void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
 	roomLabel->setString(Text::get("waiting"));
+	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
+
 }
 
 void PvoGameScene::onError(SIOClient * client, const std::string & data)
@@ -167,6 +171,9 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 	}
 	room = j.getInt("room");
 	roomLabel->setString(Text::get("room") + std::to_string(room));
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
+
 	timer->setPosition(0, drawLength - diagonal + time / timeLimit * diagonal);
 	startTimer();
 }

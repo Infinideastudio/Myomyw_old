@@ -40,9 +40,24 @@ bool GameScene::init()
 	//--发射器节点--//
 	ejectorNode = Node::create();
 	board->addChild(ejectorNode, 0);
-
+	//--双方名称--//
+	leftNameLabel = Label::createWithTTF("", "fonts/Deng.ttf", 26);
+	leftNameLabel->setTextColor(Color4B(0, 0, 0, 255));
+	this->addChild(leftNameLabel);
+	rightNameLabel = Label::createWithTTF("", "fonts/Deng.ttf", 26);
+	rightNameLabel->setTextColor(Color4B(0, 0, 0, 255));
+	this->addChild(rightNameLabel);
 	buildChessboard();
 	return true;
+}
+
+void GameScene::setNames(std::string left, std::string right)
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	leftNameLabel->setString(left);
+	leftNameLabel->setPosition(Vec2(leftNameLabel->getContentSize().width, visibleSize.height - leftNameLabel->getContentSize().height));
+	rightNameLabel->setString(right);
+	rightNameLabel->setPosition(Vec2(visibleSize.width - rightNameLabel->getContentSize().width, visibleSize.height - rightNameLabel->getContentSize().height));
 }
 
 bool GameScene::setBoardSize(int lCol, int rCol)
