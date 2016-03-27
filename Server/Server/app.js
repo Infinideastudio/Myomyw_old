@@ -1,7 +1,7 @@
 ﻿var players = new Object();
 var rooms = new Array();
 
-const defaultLCol = 5, defaultRCol = 5;
+const defaultLCol = 6, defaultRCol = 6;
 const maxLCol = 10, maxRCol = 10;
 const minLCol = 3, minRCol = 3;
 const maxMovementTimes = 5;

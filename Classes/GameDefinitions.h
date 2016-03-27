@@ -1,5 +1,5 @@
 #pragma once
-const int defaultLCol = 5, defaultRCol = 5;//默认棋盘大小
+const int defaultLCol = 6, defaultRCol = 6;//默认棋盘大小
 const int maxLCol = 10, maxRCol = 10;//最大棋盘大小
 const int minLCol = 3, minRCol = 3;//最小棋盘大小
 const float movingCooling = 0.3f;//移动冷却时间
