@@ -15,14 +15,23 @@ public:
 	~PvoGameScene();
 private:
 	Label* roomLabel;
+	ClippingNode* timerStencil;
+	DrawNode* timerStencilDrawNode;
+	LayerColor* timer;
 
-	cocos2d::network::SIOClient* client;
+	SIOClient* client;
 	bool disconnected = false;
 	bool shouldChangeTurn = false;
 	bool started = false;
 	Chessman nextChessman;//服务器提供的下一个新球
 	int room;
 	EndGameReason endGameReason;
+	float time = timeLimit;
+
+	void startTimer();
+	void stopTimer();
+	void setTurnFlag();
+	void buildChessboard();
 	void activateEjector(int col);
 	void beginMoving(int col, Chessman chessman);
 	void endMoving();

@@ -1,11 +1,12 @@
 #include "PvaGameScene.h"
-#include "XmlData.h"
+#include "Text.h"
 #include "ResultScene.h"
 
 bool PvaGameScene::init()
 {
 	if (!ControllableGameScene::init())
 		return false;
+	setNames(Text::get("me"), Text::get("machine"));
 	return true;
 }
 
@@ -45,13 +46,13 @@ void PvaGameScene::changeTurn()
 
 void PvaGameScene::leftWins()
 {
-	auto rs = ResultScene::create(XmlData::text["player wins"], Color4B(0, 255, 0, 255));
+	auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void PvaGameScene::rightWins()
 {
-	auto rs = ResultScene::create(XmlData::text["ai wins"], Color4B(0, 0, 0, 255));
+	auto rs = ResultScene::create(Text::get("aiWins"), Color4B(0, 0, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 

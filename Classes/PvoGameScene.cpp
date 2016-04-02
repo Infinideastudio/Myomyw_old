@@ -1,18 +1,28 @@
 #include "PvoGameScene.h"
-#include "XmlData.h"
+#include "Text.h"
 #include "ResultScene.h"
 #include "MainScene.h"
-#include "ResFiles.h"
 
 bool PvoGameScene::init(std::string address)
 {
+	//这两个要提早初始化，否则buildChessboard的时候会出错
+	timerStencilDrawNode = DrawNode::create();
+	timer = LayerColor::create();
 	if (!ControllableGameScene::init())
 		return false;
+	setNames(Text::get("me"), Text::get("opponent"));
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel = Label::createWithTTF(XmlData::text["connecting"], normalFont, 25);
+	roomLabel = Label::createWithTTF(Text::get("connecting"), "fonts/Deng.ttf", 25);
 	roomLabel->setTextColor(Color4B(0, 0, 0, 255));
-	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, visibleSize.height - roomLabel->getContentSize().height);
+	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
 	this->addChild(roomLabel);
+
+	timerStencil = ClippingNode::create(timerStencilDrawNode);
+	timer->changeWidthAndHeight(drawLength, drawLength);
+	timer->ignoreAnchorPointForPosition(false);
+	timer->setAnchorPoint(Vec2(0, 1));
+	timerStencil->addChild(timer);
+	board->addChild(timerStencil);
 
 	client = SocketIO::connect(address, *this);
 	if (!client)
@@ -50,6 +60,33 @@ PvoGameScene::~PvoGameScene()
 	}
 }
 
+void PvoGameScene::startTimer()
+{
+	stopTimer();
+	timer->setPosition(0, drawLength);
+	auto moveAction = MoveBy::create(timeLimit, Vec2(0, -diagonal));
+	timer->runAction(moveAction);
+}
+
+void PvoGameScene::stopTimer()
+{
+	timer->stopAllActions();
+}
+
+void PvoGameScene::setTurnFlag()
+{
+	ControllableGameScene::setTurnFlag();
+	timer->initWithColor(turn == left ? Color4B(0, 255, 0, 100) : Color4B(0, 100, 255, 100));
+}
+
+void PvoGameScene::buildChessboard()
+{
+	ControllableGameScene::buildChessboard();
+	timerStencilDrawNode->clear();
+	Vec2 stencilPoly[] = { topVertex,topVertex - Vec2(halfDiagonal,halfDiagonal),topVertex - Vec2(0,diagonal),topVertex - Vec2(-halfDiagonal,halfDiagonal) };
+	timerStencilDrawNode->drawSolidPoly(stencilPoly, 4, Color4F(1.0, 1.0, 1.0, 1.0));
+}
+
 void PvoGameScene::activateEjector(int col)
 {
 	if (turn == left && started) {
@@ -60,6 +97,7 @@ void PvoGameScene::activateEjector(int col)
 void PvoGameScene::beginMoving(int col, Chessman chessman)
 {
 	ControllableGameScene::beginMoving(col, chessman);
+	stopTimer();
 	if (turn == left) {
 		if (holdingTouching && !disconnected) {
 			Json j;
@@ -84,6 +122,9 @@ void PvoGameScene::changeTurn()
 		client->emit("changeTurn", "");
 	}
 	ControllableGameScene::changeTurn();
+	time = timeLimit;
+
+	startTimer();
 }
 
 Chessman PvoGameScene::getNextChessman()
@@ -94,7 +135,7 @@ Chessman PvoGameScene::getNextChessman()
 void PvoGameScene::leftWins()
 {
 	if (endGameReason == EndGameReason::youWin) {
-		auto rs = ResultScene::create(XmlData::text["player wins"], Color4B(0, 255, 0, 255));
+		auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
 		Director::getInstance()->replaceScene(rs);
 	}
 }
@@ -102,14 +143,17 @@ void PvoGameScene::leftWins()
 void PvoGameScene::rightWins()
 {
 	if (endGameReason == EndGameReason::youLose) {
-		auto rs = ResultScene::create(XmlData::text["online player wins"], Color4B(0, 0, 0, 255));
+		auto rs = ResultScene::create(Text::get("onlinePlayerWins"), Color4B(0, 0, 0, 255));
 		Director::getInstance()->replaceScene(rs);
 	}
 }
 
 void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
 {
-	roomLabel->setString(XmlData::text["waiting"]);
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	roomLabel->setString(Text::get("waiting"));
+	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
+
 }
 
 void PvoGameScene::onError(SIOClient * client, const std::string & data)
@@ -126,7 +170,12 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 		changeTurn();
 	}
 	room = j.getInt("room");
-	roomLabel->setString(XmlData::text["room"] + std::to_string(room));
+	roomLabel->setString(Text::get("room") + std::to_string(room));
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
+
+	timer->setPosition(0, drawLength - diagonal + time / timeLimit * diagonal);
+	startTimer();
 }
 
 void PvoGameScene::onTellNewChessman(SIOClient * client, const std::string & data)
@@ -161,14 +210,22 @@ void PvoGameScene::onEndGame(SIOClient * client, const std::string & data)
 	Json j(data);
 	endGameReason = (EndGameReason)j.getInt("reason");
 	if (endGameReason == EndGameReason::opponentLeft) {
-		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["opponent left"], Color4B(0, 0, 0, 255)));
+		Director::getInstance()->replaceScene(ResultScene::create(Text::get("opponentLeft"), Color4B(0, 0, 0, 255)));
+	}
+	else if (endGameReason == EndGameReason::timeOut) {
+		if (turn == left) {
+			Director::getInstance()->replaceScene(ResultScene::create(Text::get("playerTimeOut"), Color4B(0, 0, 0, 255)));
+		}
+		else {
+			Director::getInstance()->replaceScene(ResultScene::create(Text::get("opponentTimeOut"), Color4B(0, 0, 0, 255)));
+		}
 	}
 }
 
 void PvoGameScene::onDisconnected(SIOClient * client, const std::string & data)
 {
 	if (endGameReason == EndGameReason::unknown) {
-		Director::getInstance()->replaceScene(ResultScene::create(XmlData::text["unknown disconnect"], Color4B(0, 0, 0, 255)));
+		Director::getInstance()->replaceScene(ResultScene::create(Text::get("unknownDisconnect"), Color4B(0, 0, 0, 255)));
 	}
 	disconnected = true;
 }

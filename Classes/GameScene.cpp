@@ -1,9 +1,9 @@
 #include "GameScene.h"
-#include "XmlData.h"
+#include "Text.h"
 #include "ResultScene.h"
 #include "MainScene.h"
-#include "ResFiles.h"
 USING_NS_CC;
+
 bool GameScene::init()
 {
 	if (!Scene::init())
@@ -14,31 +14,50 @@ bool GameScene::init()
 			chessmen[i][j] = Chessman::common;
 		}
 	}
+
 	Size visibleSize = Director::getInstance()->getVisibleSize();
+	drawLength = MIN(visibleSize.width, visibleSize.height) - 10;
 	//--返回按钮--//
-	auto backItem = MenuItemImage::create(backNormal, backSelected, [](Ref* pSender)
+	auto backItem = MenuItemImage::create("UI/BackNormal.png", "UI/BackSelected.png", [](Ref* pSender)
 	{Director::getInstance()->replaceScene(MainScene::create()); });
-	backItem->setPosition(Vec2(backItem->getContentSize().width / 2 + 10, visibleSize.height - backItem->getContentSize().height / 2 - 10));
+	backItem->setPosition(Vec2(backItem->getContentSize() / 2 + Size(10, 10)));
 	auto menu = Menu::create(backItem, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu);
-
+	//--棋盘层--//
+	board = Layer::create();
+	board->setPosition((visibleSize.width - drawLength) / 2, (visibleSize.height - drawLength) / 2);
+	this->addChild(board);
 	//--网格绘制节点--//
 	gridDrawNode = DrawNode::create();
-	this->addChild(gridDrawNode, 1);
+	board->addChild(gridDrawNode, 1);
 	//--遮罩及棋子节点--//
 	stencilDrawNode = DrawNode::create();
 	stencil = ClippingNode::create(stencilDrawNode);
 	chessmanNode = Node::create();
 	stencil->addChild(chessmanNode);
-	this->addChild(stencil, 2);
-
+	board->addChild(stencil, 2);
 	//--发射器节点--//
 	ejectorNode = Node::create();
-	this->addChild(ejectorNode, 0);
-
+	board->addChild(ejectorNode, 0);
+	//--双方名称--//
+	leftNameLabel = Label::createWithTTF("", "fonts/Deng.ttf", 26);
+	leftNameLabel->setTextColor(Color4B(0, 0, 0, 255));
+	this->addChild(leftNameLabel);
+	rightNameLabel = Label::createWithTTF("", "fonts/Deng.ttf", 26);
+	rightNameLabel->setTextColor(Color4B(0, 0, 0, 255));
+	this->addChild(rightNameLabel);
 	buildChessboard();
 	return true;
+}
+
+void GameScene::setNames(std::string left, std::string right)
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	leftNameLabel->setString(left);
+	leftNameLabel->setPosition(Vec2(leftNameLabel->getContentSize().width, visibleSize.height - leftNameLabel->getContentSize().height));
+	rightNameLabel->setString(right);
+	rightNameLabel->setPosition(Vec2(visibleSize.width - rightNameLabel->getContentSize().width, visibleSize.height - rightNameLabel->getContentSize().height));
 }
 
 bool GameScene::setBoardSize(int lCol, int rCol)
@@ -83,17 +102,14 @@ void GameScene::setTurnFlag()
 //建立棋盘，在棋盘大小改变后调用
 void GameScene::buildChessboard()
 {
-	//画图时的网格数量(加上发射器)
-	int drawLCol = lCol + 1, drawRCol = rCol + 1;
+	int drawLCol = lCol + 1, drawRCol = rCol + 1;//画图时的网格数量(加上发射器)
 	auto visibleSize = this->getContentSize();
-	drawSize = MIN(visibleSize.width, visibleSize.height);
-	halfDiagonal = drawSize / (float)(drawLCol + drawRCol);
+	halfDiagonal = drawLength / (float)(drawLCol + drawRCol);
 	diagonal = 2 * halfDiagonal;
-	topVertex = Vec2(drawLCol*halfDiagonal, drawSize);
-	rightVertex = Vec2(drawSize, topVertex.x);
-	leftVertex = Vec2(0, drawSize - rightVertex.y);
+	topVertex = Vec2(drawLCol*halfDiagonal, drawLength);
+	rightVertex = Vec2(drawLength, topVertex.x);
+	leftVertex = Vec2(0, drawLength - rightVertex.y);
 	bottomVertex = Vec2(leftVertex.y, 0);
-
 	//---建立模板遮罩---//
 	stencilDrawNode->clear();
 	//遮罩不包括发射器部分
@@ -118,7 +134,7 @@ void GameScene::buildChessboard()
 	ejectorNode->removeAllChildren();
 	for (int i = 0; i < drawLCol - 1; i++)
 	{
-		auto ejector = Sprite::create(greenEjector);
+		auto ejector = Sprite::create("Ejector/Green.png");
 		ejector->setPosition(Vec2(topVertex.x - (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
 		ejector->setScaleX(diagonal / ejector->getContentSize().width);
 		ejector->setScaleY(diagonal / ejector->getContentSize().height);
@@ -127,7 +143,7 @@ void GameScene::buildChessboard()
 	}
 	for (int i = 0; i < drawRCol - 1; i++)
 	{
-		auto ejector = Sprite::create(blueEjector);
+		auto ejector = Sprite::create("Ejector/Blue.png");
 		ejector->setPosition(Vec2(topVertex.x + (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
 		ejector->setScaleX(diagonal / ejector->getContentSize().width);
 		ejector->setScaleY(diagonal / ejector->getContentSize().height);
@@ -145,7 +161,7 @@ void GameScene::updateChessboard()
 	for (int i = 0; i < lCol; i++) {
 		for (int j = 0; j < rCol; j++) {
 			auto chessman = createSpriteByChessman(chessmen[i][j]);
-			chessman->setPosition(((j - i)*halfDiagonal + topVertex.x), drawSize - (i + j + 3)*halfDiagonal);
+			chessman->setPosition(((j - i)*halfDiagonal + topVertex.x), drawLength - (i + j + 3)*halfDiagonal);
 			chessman->setTag(i*rCol + j);
 			chessmanNode->addChild(chessman);
 		}
@@ -157,16 +173,16 @@ Sprite * GameScene::createSpriteByChessman(Chessman type)
 	std::string filename;
 	switch (type) {
 	case Chessman::common:
-		filename = commonChessman;
+		filename = "Chessman/Common.png";
 		break;
 	case Chessman::key:
-		filename = keyChessman;
+		filename = "Chessman/Key.png";
 		break;
 	case Chessman::addCol:
-		filename = addColChessman;
+		filename = "Chessman/AddCol.png";
 		break;
 	case Chessman::delCol:
-		filename = delColChessman;
+		filename = "Chessman/DelCol.png";
 		break;
 	}
 	auto chessman = Sprite::create(filename);
@@ -182,7 +198,7 @@ void GameScene::beginMoving(int col, Chessman chessman)
 		movingCol = col;
 		movingNewChessman = chessman;
 		auto newChessman = createSpriteByChessman(movingNewChessman);
-		newChessman->setPosition(((turn == left ? -movingCol - 1 : movingCol + 1) * halfDiagonal + topVertex.x), drawSize - (movingCol + 2)*halfDiagonal);
+		newChessman->setPosition(((turn == left ? -movingCol - 1 : movingCol + 1) * halfDiagonal + topVertex.x), drawLength - (movingCol + 2)*halfDiagonal);
 		chessmanNode->addChild(newChessman);
 		auto movingAction = MoveBy::create(movingTime, Vec2(turn == left ? halfDiagonal : -halfDiagonal, -halfDiagonal));
 		for (int j = 0; j < (turn == left ? rCol : lCol); j++) {
@@ -244,12 +260,12 @@ void GameScene::changeTurn()
 
 void GameScene::leftWins()
 {
-	auto rs = ResultScene::create(XmlData::text["green wins"], Color4B(0, 255, 0, 255));
+	auto rs = ResultScene::create(Text::get("greenWins"), Color4B(0, 255, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void GameScene::rightWins()
 {
-	auto rs = ResultScene::create(XmlData::text["blue wins"], Color4B(0, 0, 255, 255));
+	auto rs = ResultScene::create(Text::get("blueWins"), Color4B(0, 0, 255, 255));
 	Director::getInstance()->replaceScene(rs);
 }
