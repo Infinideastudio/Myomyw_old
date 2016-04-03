@@ -86,7 +86,7 @@ bool GameScene::setBoardSize(int lCol, int rCol)
 	return true;
 }
 
-//设置回合标志(现在是发射器的透明度)
+//设置回合标志
 void GameScene::setTurnFlag()
 {
 	int leftOpacity = (turn == left ? 255 : 150);
@@ -97,6 +97,13 @@ void GameScene::setTurnFlag()
 	for (int i = lCol; i < lCol + rCol; i++) {
 		ejectorNode->getChildByTag(i)->setOpacity(rightOpacity);
 	}
+	leftNameLabel->setTextColor(turn == left ? Color4B(0, 200, 0, 255) : Color4B(0, 0, 0, 255));
+	rightNameLabel->setTextColor(turn == right ? Color4B(0, 0, 200, 255) : Color4B(0, 0, 0, 255));
+
+	auto scaleAction = ScaleTo::create(0.2f, 1.2f);
+	(turn == left ? leftNameLabel : rightNameLabel)->runAction(scaleAction);
+	auto resetAction = ScaleTo::create(0.2f, 1.0f);
+	(turn == left ? rightNameLabel : leftNameLabel)->runAction(resetAction);
 }
 
 //建立棋盘，在棋盘大小改变后调用
