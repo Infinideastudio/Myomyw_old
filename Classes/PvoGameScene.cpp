@@ -12,8 +12,7 @@ bool PvoGameScene::init(std::string address)
 		return false;
 	setNames(Text::get("me"), Text::get("opponent"));
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel = Label::createWithTTF(Text::get("connecting"), "fonts/Deng.ttf", 25);
-	roomLabel->setTextColor(Color4B(0, 0, 0, 255));
+	roomLabel = Text::createLabel(Text::get("connecting"),  25,Color4B(0, 0, 0, 255));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
 	this->addChild(roomLabel);
 

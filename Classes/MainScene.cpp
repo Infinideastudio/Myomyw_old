@@ -20,21 +20,17 @@ bool MainScene::init()
 	auto ui = Layer::create();
 	this->addChild(ui);
 
-	auto pvpLabel = Label::createWithTTF(Text::get("pvp"), "fonts/Deng.ttf", 32);
-	pvpLabel->setTextColor(Color4B(30, 100, 30, 255));
-	pvpLabel->setColor(Color3B(0, 250, 60));
+	auto pvpLabel = Text::createLabel(Text::get("pvp"), 32, Color4B(30, 100, 30, 255));
 	auto pvpItem = MenuItemLabel::create(pvpLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvpGameScene::create()); });
 	pvpItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
 
-	auto pvaLabel = Label::createWithTTF(Text::get("pva"), "fonts/Deng.ttf", 32);
-	pvaLabel->setTextColor(Color4B(30, 100, 30, 255));
+	auto pvaLabel = Text::createLabel(Text::get("pva"), 32, Color4B(30, 100, 30, 255));
 	auto pvaItem = MenuItemLabel::create(pvaLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvaGameScene::create());  });
 	pvaItem->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 
-	auto pvoLabel = Label::createWithTTF(Text::get("pvo"), "fonts/Deng.ttf", 32);
-	pvoLabel->setTextColor(Color4B(30, 100, 30, 255));
+	auto pvoLabel = Text::createLabel(Text::get("pvo"), 32, Color4B(30, 100, 30, 255));
 	auto pvoItem = MenuItemLabel::create(pvoLabel, CC_CALLBACK_1(MainScene::pvoItemCallback, this));
 	pvoItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 100);
 
@@ -54,8 +50,7 @@ bool MainScene::init()
 	auto easeAction = EaseBackOut::create(moveAction);
 	ui->runAction(easeAction);
 
-	auto versionLabel = Label::createWithTTF("Alpha 0.2", "fonts/Deng.ttf", 25);
-	versionLabel->setTextColor(Color4B(0, 0, 0, 255));
+	auto versionLabel = Text::createLabel("Alpha 0.2", 25, Color4B(0, 0, 0, 255));
 	versionLabel->setPosition(visibleSize.width - versionLabel->getContentSize().width / 2, versionLabel->getContentSize().height / 2);
 	this->addChild(versionLabel);
 	return true;

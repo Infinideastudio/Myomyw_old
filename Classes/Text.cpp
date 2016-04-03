@@ -1,12 +1,11 @@
 #include "Text.h"
 #include <sstream>
-#include "cocos2d.h"
 
 std::unordered_map<std::string, std::string> Text::texts;
 
 void Text::loadLang(std::string lang)
 {
-	std::istringstream text(cocos2d::FileUtils::getInstance()->getStringFromFile("lang/" + lang + ".lang"));
+	std::istringstream text(FileUtils::getInstance()->getStringFromFile("lang/" + lang + ".lang"));
 	std::string line;
 	int signIndex;
 	while (std::getline(text, line, '\n')) {
@@ -21,4 +20,11 @@ void Text::loadLang(std::string lang)
 std::string Text::get(std::string text)
 {
 	return texts[text];
+}
+
+Label* Text::createLabel(std::string text, float size, Color4B color)
+{
+	auto label = Label::createWithTTF(text, "fonts/deng.ttf", size);
+	label->setTextColor(color);
+	return label;
 }

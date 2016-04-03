@@ -41,11 +41,9 @@ bool GameScene::init()
 	ejectorNode = Node::create();
 	board->addChild(ejectorNode, 0);
 	//--Ë«·½Ãû³Æ--//
-	leftNameLabel = Label::createWithTTF("", "fonts/Deng.ttf", 26);
-	leftNameLabel->setTextColor(Color4B(0, 0, 0, 255));
+	leftNameLabel = Text::createLabel("", 26, Color4B(0, 0, 0, 255));
 	this->addChild(leftNameLabel);
-	rightNameLabel = Label::createWithTTF("", "fonts/Deng.ttf", 26);
-	rightNameLabel->setTextColor(Color4B(0, 0, 0, 255));
+	rightNameLabel = Text::createLabel("", 26, Color4B(0, 0, 0, 255));
 	this->addChild(rightNameLabel);
 	buildChessboard();
 	return true;
