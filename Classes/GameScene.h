@@ -22,9 +22,10 @@ protected:
 	Vec2 rightVertex;
 	Vec2 bottomVertex;
 	Layer* board;
-	Node* ejectorNode;//放发射器的节点
-	Node* chessmanNode;//放棋子的节点(也就是裁切底板)
-	DrawNode* gridDrawNode;//网格绘制节点
+	Sprite* leftEjectors[maxLCol], *rightEjectors[maxRCol];
+	DrawNode* border;
+	Node* gridNode;//网格节点
+	Node* chessmanNode;//棋子节点(也就是裁切底板)
 	Label* leftNameLabel;
 	Label* rightNameLabel;
 
@@ -34,6 +35,7 @@ protected:
 	virtual void buildChessboard();
 	virtual void updateChessboard();
 	Sprite* createSpriteByChessman(Chessman type);
+	Sprite* createSpriteByGridPicture();
 	virtual void beginMoving(int col, Chessman chessman);
 	virtual void endMoving();
 	virtual void changeTurn();

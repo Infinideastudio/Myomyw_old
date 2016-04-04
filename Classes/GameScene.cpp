@@ -29,17 +29,18 @@ bool GameScene::init()
 	board->setPosition((visibleSize.width - drawLength) / 2, (visibleSize.height - drawLength) / 2);
 	this->addChild(board);
 	//--网格绘制节点--//
-	gridDrawNode = DrawNode::create();
-	board->addChild(gridDrawNode, 1);
+	gridNode = Node::create();
+	board->addChild(gridNode, 0);
+
+	border = DrawNode::create();
+	board->addChild(border);
+
 	//--遮罩及棋子节点--//
 	stencilDrawNode = DrawNode::create();
 	stencil = ClippingNode::create(stencilDrawNode);
 	chessmanNode = Node::create();
 	stencil->addChild(chessmanNode);
-	board->addChild(stencil, 2);
-	//--发射器节点--//
-	ejectorNode = Node::create();
-	board->addChild(ejectorNode, 0);
+	board->addChild(stencil, 1);
 	//--双方名称--//
 	leftNameLabel = Text::createLabel("", 26, Color4B(0, 0, 0, 255));
 	this->addChild(leftNameLabel);
@@ -90,10 +91,10 @@ void GameScene::setTurnFlag()
 	int leftOpacity = (turn == left ? 255 : 150);
 	int rightOpacity = (turn == right ? 255 : 150);
 	for (int i = 0; i < lCol; i++) {
-		ejectorNode->getChildByTag(i)->setOpacity(leftOpacity);
+		leftEjectors[i]->setOpacity(leftOpacity);
 	}
-	for (int i = lCol; i < lCol + rCol; i++) {
-		ejectorNode->getChildByTag(i)->setOpacity(rightOpacity);
+	for (int i = 0; i < rCol; i++) {
+		rightEjectors[i]->setOpacity(rightOpacity);
 	}
 	leftNameLabel->setTextColor(turn == left ? Color4B(0, 200, 0, 255) : Color4B(0, 0, 0, 255));
 	rightNameLabel->setTextColor(turn == right ? Color4B(0, 0, 200, 255) : Color4B(0, 0, 0, 255));
@@ -108,7 +109,7 @@ void GameScene::setTurnFlag()
 void GameScene::buildChessboard()
 {
 	int drawLCol = lCol + 1, drawRCol = rCol + 1;//画图时的网格数量(加上发射器)
-	auto visibleSize = this->getContentSize();
+	auto visibleSize = Director::getInstance()->getVisibleSize();
 	halfDiagonal = drawLength / (float)(drawLCol + drawRCol);
 	diagonal = 2 * halfDiagonal;
 	topVertex = Vec2(drawLCol*halfDiagonal, drawLength);
@@ -121,39 +122,53 @@ void GameScene::buildChessboard()
 	//扩大一像素是为了不遮住线
 	Vec2 stencilPoly[] = { topVertex + Vec2(0, 1 - diagonal), leftVertex + Vec2(-1 + halfDiagonal, -halfDiagonal), bottomVertex + Vec2(0, -1) , rightVertex + Vec2(1 - halfDiagonal, -halfDiagonal) };
 	stencilDrawNode->drawSolidPoly(stencilPoly, 4, Color4F(1.0, 1.0, 1.0, 1.0));
-	//---绘制网格---//
-	gridDrawNode->clear();
-	for (int i = 0; i <= drawLCol; i++)
+	//--绘制网格--//
+	gridNode->removeAllChildren();
+	for (int l = 0; l < drawLCol; l++)
 	{
-		gridDrawNode->drawLine(Vec2(topVertex.x - halfDiagonal*i, topVertex.y - halfDiagonal*i),
-			Vec2(topVertex.x - halfDiagonal*(i - drawRCol), topVertex.y - halfDiagonal*(i + drawRCol)),
-			Color4F(0.0, 0.0, 0.0, 1.0));
-	}
-	for (int i = 0; i <= drawRCol; i++)
-	{
-		gridDrawNode->drawLine(Vec2(topVertex.x + halfDiagonal*i, topVertex.y - halfDiagonal*i),
-			Vec2(topVertex.x + halfDiagonal*(i - drawLCol), topVertex.y - halfDiagonal*(i + drawLCol)),
-			Color4F(0.0, 0.0, 0.0, 1.0));
-	}
-	//--装备发射器--//
-	ejectorNode->removeAllChildren();
-	for (int i = 0; i < drawLCol - 1; i++)
-	{
-		auto ejector = Sprite::create("Ejector/Green.png");
-		ejector->setPosition(Vec2(topVertex.x - (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
-		ejector->setScaleX(diagonal / ejector->getContentSize().width);
-		ejector->setScaleY(diagonal / ejector->getContentSize().height);
-		ejector->setTag(i);
-		ejectorNode->addChild(ejector);
-	}
-	for (int i = 0; i < drawRCol - 1; i++)
-	{
-		auto ejector = Sprite::create("Ejector/Blue.png");
-		ejector->setPosition(Vec2(topVertex.x + (i + 1)*halfDiagonal, topVertex.y - (2 + i)*halfDiagonal));
-		ejector->setScaleX(diagonal / ejector->getContentSize().width);
-		ejector->setScaleY(diagonal / ejector->getContentSize().height);
-		ejector->setTag(lCol + i);
-		ejectorNode->addChild(ejector);
+		for (int r = 0; r < drawRCol; r++)
+		{
+			Sprite* grid;
+			if (l == 0 && r == 0) {
+				continue;
+			}
+			else if (r == 0) {
+				grid = Sprite::create("Grid/GreenEjector.png");
+				leftEjectors[l - 1] = grid;
+			}
+			else if (l == 0) {
+				grid = Sprite::create("Grid/BlueEjector.png");
+				rightEjectors[r - 1] = grid;
+			}
+			else if ((l + r) % 2 == 0) {
+				grid = Sprite::create("Grid/Grid1.png");
+			}
+			else {
+				grid = Sprite::create("Grid/Grid2.png");
+			}
+			grid->setRotation(45);
+			grid->setScale(diagonal / sqrt(2 * pow(MAX(grid->getContentSize().width, grid->getContentSize().height), 2)));
+			grid->setPosition((r - l)*halfDiagonal + topVertex.x, drawLength - (l + r + 1)*halfDiagonal);
+			gridNode->addChild(grid);
+		}
+		//--边框线--//
+		border->clear();
+		for (int i = 0; i <= drawLCol; i++)
+		{
+			border->drawLine(Vec2(topVertex.x - halfDiagonal*i, topVertex.y - halfDiagonal*i),
+				i > 1 && i < drawLCol ?
+				Vec2(topVertex.x - halfDiagonal*(i - 1), topVertex.y - halfDiagonal*(i + 1)) :
+				Vec2(topVertex.x - halfDiagonal*(i - drawRCol), topVertex.y - halfDiagonal*(i + drawRCol)),
+				Color4F(0.5, 0.5, 0.5, 1.0));
+		}
+		for (int i = 0; i <= drawRCol; i++)
+		{
+			border->drawLine(Vec2(topVertex.x + halfDiagonal*i, topVertex.y - halfDiagonal*i),
+				i > 1 && i < drawRCol ?
+				Vec2(topVertex.x + halfDiagonal*(i - 1), topVertex.y - halfDiagonal*(i + 1)) :
+				Vec2(topVertex.x + halfDiagonal*(i - drawLCol), topVertex.y - halfDiagonal*(i + drawLCol)),
+				Color4F(0.5, 0.5, 0.5, 1.0));
+		}
 	}
 	setTurnFlag();
 	updateChessboard();
@@ -163,11 +178,11 @@ void GameScene::buildChessboard()
 void GameScene::updateChessboard()
 {
 	chessmanNode->removeAllChildren();
-	for (int i = 0; i < lCol; i++) {
-		for (int j = 0; j < rCol; j++) {
-			auto chessman = createSpriteByChessman(chessmen[i][j]);
-			chessman->setPosition(((j - i)*halfDiagonal + topVertex.x), drawLength - (i + j + 3)*halfDiagonal);
-			chessman->setTag(i*rCol + j);
+	for (int l = 0; l < lCol; l++) {
+		for (int r = 0; r < rCol; r++) {
+			auto chessman = createSpriteByChessman(chessmen[l][r]);
+			chessman->setPosition(((r - l)*halfDiagonal + topVertex.x), drawLength - (l + r + 3)*halfDiagonal);
+			chessman->setTag(l*rCol + r);
 			chessmanNode->addChild(chessman);
 		}
 	}
@@ -206,8 +221,8 @@ void GameScene::beginMoving(int col, Chessman chessman)
 		newChessman->setPosition(((turn == left ? -movingCol - 1 : movingCol + 1) * halfDiagonal + topVertex.x), drawLength - (movingCol + 2)*halfDiagonal);
 		chessmanNode->addChild(newChessman);
 		auto movingAction = MoveBy::create(movingTime, Vec2(turn == left ? halfDiagonal : -halfDiagonal, -halfDiagonal));
-		for (int j = 0; j < (turn == left ? rCol : lCol); j++) {
-			chessmanNode->getChildByTag(turn == left ? movingCol*rCol + j : j*rCol + movingCol)->runAction(movingAction->clone());
+		for (int i = 0; i < (turn == left ? rCol : lCol); i++) {
+			chessmanNode->getChildByTag(turn == left ? movingCol*rCol + i : i*rCol + movingCol)->runAction(movingAction->clone());
 		}
 		newChessman->runAction(movingAction->clone());
 		scheduleOnce(CC_CALLBACK_0(GameScene::endMoving, this), movingTime, "move");
