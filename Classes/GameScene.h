@@ -35,7 +35,6 @@ protected:
 	virtual void buildChessboard();
 	virtual void updateChessboard();
 	Sprite* createSpriteByChessman(Chessman type);
-	Sprite* createSpriteByGridPicture();
 	virtual void beginMoving(int col, Chessman chessman);
 	virtual void endMoving();
 	virtual void changeTurn();

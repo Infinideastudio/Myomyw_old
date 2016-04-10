@@ -78,7 +78,9 @@ bool GameScene::setBoardSize(int lCol, int rCol)
 			}
 		}
 	}
-
+	board->setScale((float)(lCol + rCol) / (this->lCol + this->rCol));
+	auto scaleAction = ScaleTo::create(boardScaleTime, 1);
+	board->runAction(scaleAction);
 	this->lCol = lCol;
 	this->rCol = rCol;
 	buildChessboard();

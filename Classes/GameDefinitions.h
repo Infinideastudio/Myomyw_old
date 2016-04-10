@@ -6,6 +6,7 @@ const float movingCooling = 0.3f;//移动冷却时间
 const float movingTime = 0.3f;//移动用时
 const int maxMovementTimes = 5;//最大移动数量
 const int timeLimit = 20;//超时时间
+const float boardScaleTime = 0.2f;//缩放动画时间
 
 enum Side { left, right };
 enum class Chessman { unknown, common, key, addCol, delCol };
