@@ -1,12 +1,13 @@
 #include "PvaGameScene.h"
 #include "Text.h"
+#include "Player.h"
 #include "ResultScene.h"
 
 bool PvaGameScene::init()
 {
 	if (!ControllableGameScene::init())
 		return false;
-	setNames(Text::get("me"), Text::get("machine"));
+	setNames(Player::getName(), Text::get("machine"));
 	return true;
 }
 

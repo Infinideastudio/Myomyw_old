@@ -10,8 +10,8 @@ using namespace cocos2d::network;
 class PvoGameScene :public ControllableGameScene, public SocketIO::SIODelegate
 {
 public:
-	virtual bool init(std::string address);
-	static PvoGameScene* create(std::string address);
+	virtual bool init();
+	CREATE_FUNC(PvoGameScene);
 	~PvoGameScene();
 private:
 	Label* roomLabel;

@@ -1,6 +1,7 @@
 #pragma once
 #include "cocos2d.h"
 #include "ui\UIEditBox\UIEditBox.h"
+USING_NS_CC;
 
 class MainScene :public cocos2d::Scene
 {
@@ -8,7 +9,12 @@ public:
 	virtual bool init();
 	CREATE_FUNC(MainScene);
 private:
-	cocos2d::ui::EditBox* addressBox;
+	ui::EditBox *nameBox, *addressBox;
+	Layer* uiLayer;
+	Label* playerLabel;
+	MenuItemLabel* pvoItem;
 
-	void pvoItemCallback(Ref* pSender);
+	void moveToMainLayer();
+	void moveToLoginLayer();
+	void updatePlayerLabel();
 };

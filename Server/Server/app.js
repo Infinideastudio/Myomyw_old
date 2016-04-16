@@ -13,7 +13,22 @@ const unknow = 0, common = 1, key = 2, addCol = 3, delCol = 4;//棋子种类
 const nothing = 0, leftWins = 1, rightWins = 2;//移动结果
 const opponentLeft = 1, youWin = 2, youLose = 3, timeOut = 4;//结束理由
 
-var io = require('socket.io').listen(8000);
+var URL = require('url');
+var http = require('http').createServer(
+    function (request, response) {
+        response.writeHead(200);
+        switch (URL.parse(request.url).path) {
+            case "/is_server":
+                response.write('test server');
+                break;
+            default:
+                response.write('<h1>It is a Myomyw server.<h1>');
+                break;
+        }
+        response.end();
+    }).listen(8000);
+var io = require('socket.io')(http);
+
 console.log('listening on port 8000');
 
 io.on('connection', function (socket) {

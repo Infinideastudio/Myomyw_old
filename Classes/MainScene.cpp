@@ -3,6 +3,7 @@
 #include "PvaGameScene.h"
 #include "PvoGameScene.h"
 #include "Text.h"
+#include "Player.h"
 USING_NS_CC;
 
 bool MainScene::init()
@@ -10,15 +11,61 @@ bool MainScene::init()
 	if (!Scene::init())
 		return false;
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-
+	//--背景图片--//
 	auto background = Sprite::create("UI/MainScene.png");
 	float scale = MAX(visibleSize.width / background->getContentSize().width, visibleSize.height / background->getContentSize().height);
 	background->setScale(scale);
 	background->setPosition(visibleSize.width / 2, visibleSize.height - background->getContentSize().height * scale * 0.5);
 	this->addChild(background);
+	//--总界面层--//
+	uiLayer = Layer::create();
+	if (Player::isLogged()) {
+		uiLayer->setPosition(-visibleSize.width, 0);
+	}
+	this->addChild(uiLayer);
+	//--登录界面层--//
+	auto loginLayer = Layer::create();
+	uiLayer->addChild(loginLayer);
+	auto captionLabel = Text::createLabel(Text::get("loginCaption"), 40, Color4B(0, 0, 0, 255));
+	captionLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
+	loginLayer->addChild(captionLabel);
 
-	auto ui = Layer::create();
-	this->addChild(ui);
+	nameBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
+	nameBox->setFontColor(Color4B(0, 0, 0, 255));
+	nameBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 50));
+	nameBox->setPlaceHolder(Text::get("enterName").c_str());
+	nameBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
+	loginLayer->addChild(nameBox);
+
+	addressBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
+	addressBox->setFontColor(Color4B(0, 0, 0, 255));
+	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 50));
+	addressBox->setPlaceHolder(Text::get("enterAddress").c_str());
+	addressBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
+	loginLayer->addChild(addressBox);
+
+	auto loginLabel = Text::createLabel(Text::get("login"), 32, Color4B(30, 100, 30, 255));
+	auto loginItem = MenuItemLabel::create(loginLabel, [this](Ref* pSender) {
+		Player::login(nameBox->getText(), addressBox->getText(), CC_CALLBACK_0(MainScene::moveToMainLayer, this), [](std::string error) {
+			MessageBox(error.c_str(), "Myomyw");
+		});
+	});
+	loginItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 100);
+
+	auto guestLabel = Text::createLabel(Text::get("loginWithGuest"), 32, Color4B(30, 100, 30, 255));
+	auto guestItem = MenuItemLabel::create(guestLabel, [this](Ref* pSender) {
+		Player::loginWithGuest();
+		moveToMainLayer();
+	});
+	guestItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 200);
+
+	auto loginMenu = Menu::create(loginItem, guestItem, NULL);
+	loginMenu->setPosition(Vec2::ZERO);
+	loginLayer->addChild(loginMenu);
+	//--主界面层--//
+	auto mainLayer = Layer::create();
+	mainLayer->setPosition(Vec2(visibleSize.width, 0));
+	uiLayer->addChild(mainLayer);
 
 	auto pvpLabel = Text::createLabel(Text::get("pvp"), 32, Color4B(30, 100, 30, 255));
 	auto pvpItem = MenuItemLabel::create(pvpLabel, [](Ref* pSender)
@@ -31,24 +78,27 @@ bool MainScene::init()
 	pvaItem->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 
 	auto pvoLabel = Text::createLabel(Text::get("pvo"), 32, Color4B(30, 100, 30, 255));
-	auto pvoItem = MenuItemLabel::create(pvoLabel, CC_CALLBACK_1(MainScene::pvoItemCallback, this));
+	pvoItem = MenuItemLabel::create(pvoLabel, [](Ref* pSender) {
+		Director::getInstance()->replaceScene(PvoGameScene::create());
+	});
 	pvoItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 100);
 
-	auto menu = Menu::create(pvpItem, pvaItem, pvoItem, NULL);
-	menu->setPosition(Vec2::ZERO);
-	ui->addChild(menu);
+	auto logoutLabel = Text::createLabel(Text::get("logout"), 25, Color4B(255, 0, 0, 255));
+	auto logoutItem = MenuItemLabel::create(logoutLabel, [this](Ref* pSender) {
+		Player::logout();
+		moveToLoginLayer();
+	});
+	logoutItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 200);
 
-	addressBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
-	addressBox->setFontColor(Color4B(0, 0, 0, 255));
-	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 150));
-	addressBox->setPlaceHolder(Text::get("enterAddress").c_str());
-	addressBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
-	ui->addChild(addressBox);
+	auto mainMenu = Menu::create(pvpItem, pvaItem, pvoItem, logoutItem, NULL);
+	mainMenu->setPosition(Vec2::ZERO);
+	mainLayer->addChild(mainMenu);
 
-	ui->setPosition(0, -ui->getContentSize().height);
-	auto moveAction = MoveTo::create(1, Vec2::ZERO);
-	auto easeAction = EaseBackOut::create(moveAction);
-	ui->runAction(easeAction);
+	playerLabel = Text::createLabel("", 25, Color4B(0, 0, 0, 255));
+	mainLayer->addChild(playerLabel);
+	if (Player::isLogged()) {
+		updatePlayerLabel();
+	}
 
 	auto versionLabel = Text::createLabel("Alpha 0.2", 25, Color4B(0, 0, 0, 255));
 	versionLabel->setPosition(visibleSize.width - versionLabel->getContentSize().width / 2, versionLabel->getContentSize().height / 2);
@@ -56,7 +106,33 @@ bool MainScene::init()
 	return true;
 }
 
-void MainScene::pvoItemCallback(Ref * pSender)
+void MainScene::moveToMainLayer()
 {
-	Director::getInstance()->replaceScene(PvoGameScene::create(addressBox->getText()));
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	auto moveAction = MoveTo::create(1, Vec2(-visibleSize.width, 0));
+	auto easeAction = EaseExponentialInOut::create(moveAction);
+	uiLayer->runAction(easeAction);
+	pvoItem->setEnabled(!Player::isGuest());
+	updatePlayerLabel();
+}
+
+void MainScene::moveToLoginLayer()
+{
+	auto moveAction = MoveTo::create(1, Vec2::ZERO);
+	auto easeAction = EaseExponentialInOut::create(moveAction);
+	uiLayer->runAction(easeAction);
+}
+
+void MainScene::updatePlayerLabel()
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	auto str = Player::getName();
+	if (!Player::isGuest()) {
+		str.append("  ");
+		str.append(Text::get("serverName"));
+		str.append(Player::getServerName());
+	}
+	playerLabel->setString(str);
+	playerLabel->setPosition(Vec2(playerLabel->getContentSize().width / 2 + 20,
+		visibleSize.height - playerLabel->getContentSize().height / 2 - 20));
 }

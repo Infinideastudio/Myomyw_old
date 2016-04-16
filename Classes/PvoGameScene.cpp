@@ -1,18 +1,19 @@
 #include "PvoGameScene.h"
 #include "Text.h"
+#include "Player.h"
 #include "ResultScene.h"
 #include "MainScene.h"
 
-bool PvoGameScene::init(std::string address)
+bool PvoGameScene::init()
 {
 	//这两个要提早初始化，否则buildChessboard的时候会出错
 	timerStencilDrawNode = DrawNode::create();
 	timer = LayerColor::create();
 	if (!ControllableGameScene::init())
 		return false;
-	setNames(Text::get("me"), Text::get("opponent"));
+	setNames(Player::getName(), Text::get("opponent"));
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel = Text::createLabel(Text::get("connecting"),  25,Color4B(0, 0, 0, 255));
+	roomLabel = Text::createLabel(Text::get("connecting"), 25, Color4B(0, 0, 0, 255));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
 	this->addChild(roomLabel);
 
@@ -23,7 +24,7 @@ bool PvoGameScene::init(std::string address)
 	timerStencil->addChild(timer);
 	board->addChild(timerStencil);
 
-	client = SocketIO::connect(address, *this);
+	client = SocketIO::connect(Player::getServer(), *this);
 	if (!client)
 		return false;
 	client->on("connect", CC_CALLBACK_2(PvoGameScene::onConnect, this));
@@ -34,22 +35,6 @@ bool PvoGameScene::init(std::string address)
 	client->on("endGame", CC_CALLBACK_2(PvoGameScene::onEndGame, this));
 	client->on("disconnect", CC_CALLBACK_2(PvoGameScene::onDisconnected, this));
 	return true;
-}
-
-PvoGameScene* PvoGameScene::create(std::string address)
-{
-	PvoGameScene* pRet = new(std::nothrow) PvoGameScene();
-	if (pRet && pRet->init(address))
-	{
-		pRet->autorelease();
-		return pRet;
-	}
-	else
-	{
-		delete pRet;
-		pRet = nullptr;
-		return nullptr;
-	}
 }
 
 PvoGameScene::~PvoGameScene()
