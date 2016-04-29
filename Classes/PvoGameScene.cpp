@@ -118,18 +118,14 @@ Chessman PvoGameScene::getNextChessman()
 
 void PvoGameScene::leftWins()
 {
-	if (endGameReason == EndGameReason::youWin) {
-		auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
-		Director::getInstance()->replaceScene(rs);
-	}
+	auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
+	Director::getInstance()->replaceScene(rs);
 }
 
 void PvoGameScene::rightWins()
 {
-	if (endGameReason == EndGameReason::youLose) {
-		auto rs = ResultScene::create(Text::get("onlinePlayerWins"), Color4B(0, 0, 0, 255));
-		Director::getInstance()->replaceScene(rs);
-	}
+	auto rs = ResultScene::create(Text::get("onlinePlayerWins"), Color4B(0, 0, 0, 255));
+	Director::getInstance()->replaceScene(rs);
 }
 
 void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
