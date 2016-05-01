@@ -9,7 +9,7 @@ const timeLimit = 20000;//超时时间(ms)
 const MaxInterval = 30000;//两次移动之间的最大间隔(ms)
 const waiting = 0, playing = 1, over = 2;//房间状态
 const left = 0, right = 1;//左右侧
-const unknow = 0, common = 1, key = 2, addCol = 3, delCol = 4;//棋子种类
+const unknow = 0, common = 1, key = 2, addCol = 3, delCol = 4, flip = 5;//棋子种类
 const nothing = 0, leftWins = 1, rightWins = 2;//移动结果
 const opponentLeft = 1, youWin = 2, youLose = 3, timeOut = 4;//结束理由
 
@@ -68,7 +68,7 @@ io.on('connection', function (socket) {
         players[socket.id] = index;
         room.id = index;
     }
-
+    
     socket.on('beginMoving', function (data) {
         data = JSON.parse(data);
         if (data.col == undefined) { return; }
@@ -118,7 +118,7 @@ io.on('connection', function (socket) {
             }
         }
     });
-
+    
     socket.on('changeTurn', function () {
         var room = rooms[players[socket.id]];
         if (room.currentPlayer().id == socket.id && room.totalMovementTimes > 0) {
@@ -129,7 +129,7 @@ io.on('connection', function (socket) {
             console.log('changeTurn ' + room.turn);
         }
     });
-
+    
     socket.on('disconnect', function () {
         console.log('disconnected ' + socket.id);
         var roomid = players[socket.id];
@@ -180,6 +180,8 @@ function getRandomChessman() {
             return addCol;
         case 2:
             return delCol;
+        case 3:
+            return flip;
         default:
             return common;
     }
@@ -204,12 +206,12 @@ function Room() {
     this.movingCol = null;
     this.totalMovementTimes = 0;
     this.timeOutHandle = null;
-
+    
     this.start = function () {
         var _this = this;
         this.timeOutHandle = setTimeout(function () { _this.timeOut() }, timeLimit);
     }
-
+    
     this.move = function (col, chessman) {
         var lastChessman;//暂存最底下的棋子
         if (this.turn == left) {
@@ -227,6 +229,9 @@ function Room() {
                     break;
                 case delCol:
                     this.setBoardSize(this.lCol, this.rCol - 1);
+                    break;
+                case flip:
+                    this.flip();
                     break;
             }
         }
@@ -246,11 +251,14 @@ function Room() {
                 case delCol:
                     this.setBoardSize(this.lCol - 1, this.rCol);
                     break;
+                case flip:
+                    this.flip();
+                    break;
             }
         }
         return nothing;
     }
-
+    
     this.setBoardSize = function (lCol, rCol) {
         if (lCol > maxLCol || lCol < minLCol || rCol > maxRCol || rCol < minRCol)
             return false;
@@ -272,15 +280,27 @@ function Room() {
         this.rCol = rCol;
         return true;
     }
-
+    
+    this.flip = function () {
+        for (var i = 0; i < this.lCol; i++) {
+            for (var j = i + 1; j < this.rCol; j++) {
+                this.chessmen[i][j] ^= this.chessmen[j][i];
+                this.chessmen[j][i] ^= this.chessmen[i][j];
+                this.chessmen[i][j] ^= this.chessmen[j][i];
+            }
+        }
+        this.lCol ^= this.rCol;
+        this.rCol ^= this.lCol;
+        this.lCol ^= this.rCol;
+    }
     this.currentPlayer = function () {
         return this.turn == left ? this.leftPlayer : this.rightPlayer
     }
-
+    
     this.waitingPlayer = function () {
         return this.turn == left ? this.rightPlayer : this.leftPlayer
     }
-
+    
     this.changeTurn = function () {
         this.turn = this.turn == left ? right : left;
         this.movingCol = null;
@@ -289,7 +309,7 @@ function Room() {
         var _this = this;
         this.timeOutHandle = setTimeout(function () { _this.timeOut() }, timeLimit);
     }
-
+    
     this.timeOut = function () {
         var room = rooms[this.id];
         this.leftPlayer.emit('endGame', { reason: timeOut });

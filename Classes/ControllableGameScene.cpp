@@ -100,6 +100,8 @@ Chessman ControllableGameScene::getNextChessman()
 		return Chessman::addCol;
 	case 2:
 		return Chessman::delCol;
+	case 3:
+		return Chessman::flip;
 	default:
 		return Chessman::common;
 	}

@@ -9,6 +9,6 @@ const int timeLimit = 20;//超时时间
 const float boardScaleTime = 0.2f;//缩放动画时间
 
 enum Side { left, right };
-enum class Chessman { unknown, common, key, addCol, delCol };
+enum class Chessman { unknown, common, key, addCol, delCol, flip };
 enum class GameMode { pvp, pva, pvo };
 enum class EndGameReason { unknown, opponentLeft, youWin, youLose, timeOut };

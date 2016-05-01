@@ -31,6 +31,7 @@ protected:
 
 	void setNames(std::string left, std::string right);
 	bool setBoardSize(int lCol, int rCol);
+	void flip();
 	virtual void setTurnFlag();
 	virtual void buildChessboard();
 	virtual void updateChessboard();

@@ -87,6 +87,19 @@ bool GameScene::setBoardSize(int lCol, int rCol)
 	return true;
 }
 
+void GameScene::flip()
+{
+	for (int i = 0; i < lCol; i++)
+	{
+		for (int j = i + 1; j < rCol; j++)
+		{
+			std::swap(chessmen[i][j], chessmen[j][i]);
+		}
+	}
+	std::swap(lCol, rCol);
+	buildChessboard();
+}
+
 //设置回合标志
 void GameScene::setTurnFlag()
 {
@@ -206,6 +219,8 @@ Sprite * GameScene::createSpriteByChessman(Chessman type)
 	case Chessman::delCol:
 		filename = "Chessman/DelCol.png";
 		break;
+	case Chessman::flip:
+		filename = "Chessman/Flip.png";
 	}
 	auto chessman = Sprite::create(filename);
 	chessman->setScaleX(halfDiagonal / chessman->getContentSize().width);
@@ -251,6 +266,9 @@ void GameScene::endMoving()
 		case Chessman::delCol:
 			setBoardSize(lCol, rCol - 1);
 			break;
+		case Chessman::flip:
+			flip();
+			break;
 		}
 	}
 	else {
@@ -269,6 +287,8 @@ void GameScene::endMoving()
 		case Chessman::delCol:
 			setBoardSize(lCol - 1, rCol);
 			break;
+		case Chessman::flip:
+			flip();
 		}
 	}
 	updateChessboard();
