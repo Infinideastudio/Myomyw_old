@@ -9,7 +9,7 @@ bool PvoGameScene::init()
 	//这两个要提早初始化，否则buildChessboard的时候会出错
 	timerStencilDrawNode = DrawNode::create();
 	timer = LayerColor::create();
-	if (!ControllableGameScene::init())
+	if (!GameScene::init())
 		return false;
 	setNames(Player::getName(), Text::get("opponent"));
 	Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -59,31 +59,24 @@ void PvoGameScene::stopTimer()
 
 void PvoGameScene::setTurnFlag()
 {
-	ControllableGameScene::setTurnFlag();
+	GameScene::setTurnFlag();
 	timer->initWithColor(turn == left ? Color4B(0, 255, 0, 100) : Color4B(0, 100, 255, 100));
 }
 
 void PvoGameScene::buildChessboard()
 {
-	ControllableGameScene::buildChessboard();
+	GameScene::buildChessboard();
 	timerStencilDrawNode->clear();
 	Vec2 stencilPoly[] = { topVertex,topVertex - Vec2(halfDiagonal,halfDiagonal),topVertex - Vec2(0,diagonal),topVertex - Vec2(-halfDiagonal,halfDiagonal) };
 	timerStencilDrawNode->drawSolidPoly(stencilPoly, 4, Color4F(1.0, 1.0, 1.0, 1.0));
 }
 
-void PvoGameScene::activateEjector(int col)
-{
-	if (turn == left && started) {
-		ControllableGameScene::activateEjector(col);
-	}
-}
-
 void PvoGameScene::beginMoving(int col, Chessman chessman)
 {
-	ControllableGameScene::beginMoving(col, chessman);
+	GameScene::beginMoving(col, chessman);
 	stopTimer();
 	if (turn == left) {
-		if (holdingTouching && !disconnected) {
+		if (touching && !disconnected) {
 			Json j;
 			j.add("col", col);
 			client->emit("beginMoving", j.toString());
@@ -93,10 +86,18 @@ void PvoGameScene::beginMoving(int col, Chessman chessman)
 
 void PvoGameScene::endMoving()
 {
-	ControllableGameScene::endMoving();
-	if (shouldChangeTurn) {
-		changeTurn();
-		shouldChangeTurn = false;
+	GameScene::endMoving();
+	if (!movementBuffer.empty()) {
+		scheduleOnce([this](float) {
+			move(movementBuffer.back());
+			movementBuffer.pop_back();
+		}, movingCooling, "cool");
+	}
+	else {
+		if (shouldEndTurn) {
+			endTurn();
+			shouldEndTurn = false;
+		}
 	}
 }
 
@@ -105,9 +106,14 @@ void PvoGameScene::changeTurn()
 	if (turn == left && !disconnected) {
 		client->emit("changeTurn", "");
 	}
-	ControllableGameScene::changeTurn();
+	GameScene::changeTurn();
+	if (turn == left) {
+		state = GameState::controlling;
+	}
+	else {
+		state = GameState::external;
+	}
 	time = timeLimit;
-
 	startTimer();
 }
 
@@ -148,6 +154,7 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 	Json j(data);
 	if (j.getInt("side") == right) {
 		changeTurn();
+		state = GameState::external;
 	}
 	room = j.getInt("room");
 	roomLabel->setString(Text::get("room") + std::to_string(room));
@@ -168,19 +175,29 @@ void PvoGameScene::onBeginMoving(SIOClient * client, const std::string & data)
 {
 	if (turn == right) {
 		Json j(data);
-		beginMoving(j.getInt("col"), (Chessman)j.getInt("chessman"));
+		if (firstMessage) {
+			setMovingCol(j.getInt("col"));
+			firstMessage = false;
+		}
+		if (state == GameState::moving) {
+			movementBuffer.push_back((Chessman)j.getInt("chessman"));
+		}
+		else {
+			move((Chessman)j.getInt("chessman"));
+		}
 	}
 }
 
 void PvoGameScene::onChangeTurn(SIOClient * client, const std::string & data)
 {
 	if (turn == right) {
-		//如果还在移动就设置shouldChangeTurn为true，这样移动完成后就会切换回合
-		if (moving) {
-			shouldChangeTurn = true;
+		firstMessage = true;
+		//如果还在移动就设置shouldEndTurn为true，这样移动完成后就会切换回合
+		if (state == GameState::moving) {
+			shouldEndTurn = true;
 		}
 		else {
-			changeTurn();
+			endTurn();
 		}
 	}
 }

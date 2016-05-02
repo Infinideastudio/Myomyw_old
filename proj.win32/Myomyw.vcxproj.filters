@@ -31,9 +31,6 @@
     <ClCompile Include="..\Classes\PvpGameScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\ControllableGameScene.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\PvaGameScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -76,9 +73,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\PvoGameScene.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\ControllableGameScene.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Json.h">

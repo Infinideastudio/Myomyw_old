@@ -1,5 +1,5 @@
 #pragma once
-#include "ControllableGameScene.h"
+#include "GameScene.h"
 #include "cocos2d.h"
 #include "network\SocketIO.h"
 #include "Json.h"
@@ -7,7 +7,7 @@
 USING_NS_CC;
 using namespace cocos2d::network;
 
-class PvoGameScene :public ControllableGameScene, public SocketIO::SIODelegate
+class PvoGameScene :public GameScene, public SocketIO::SIODelegate
 {
 public:
 	virtual bool init();
@@ -18,11 +18,13 @@ private:
 	ClippingNode* timerStencil;
 	DrawNode* timerStencilDrawNode;
 	LayerColor* timer;
+	bool firstMessage = true;
 
 	SIOClient* client;
 	bool disconnected = false;
-	bool shouldChangeTurn = false;
+	bool shouldEndTurn = false;
 	bool started = false;
+	std::vector<Chessman> movementBuffer;//传入移动时的缓冲
 	Chessman nextChessman;//服务器提供的下一个新球
 	int room;
 	EndGameReason endGameReason;
@@ -32,7 +34,6 @@ private:
 	void stopTimer();
 	void setTurnFlag();
 	void buildChessboard();
-	void activateEjector(int col);
 	void beginMoving(int col, Chessman chessman);
 	void endMoving();
 	void changeTurn();

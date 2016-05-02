@@ -5,43 +5,40 @@
 
 bool PvaGameScene::init()
 {
-	if (!ControllableGameScene::init())
+	if (!GameScene::init())
 		return false;
 	setNames(Player::getName(), Text::get("machine"));
 	return true;
-}
-
-void PvaGameScene::activateEjector(int col)
-{
-	if (turn == left) {
-		ControllableGameScene::activateEjector(col);
-	}
 }
 
 void PvaGameScene::endMoving()
 {
 	//下面的代码貌似能简化对吧，但别简化。。。
 	if (turn == right) {
-		ControllableGameScene::endMoving();
+		GameScene::endMoving();
 		if (AIMovementTimes > 0) {
 			AIMovementTimes--;
-			scheduleOnce(CC_CALLBACK_0(PvaGameScene::beginMoving, this, AIMovingCol, getNextChessman()), movingCooling, "cooling");
+			scheduleOnce([this](float) {GameScene::move(getNextChessman()); }, movingCooling, "cool");
 		}
 		else {
 			changeTurn();
 		}
 	}
 	else {
-		ControllableGameScene::endMoving();
+		GameScene::endMoving();
 	}
-
 }
 
 void PvaGameScene::changeTurn()
 {
-	ControllableGameScene::changeTurn();
+	GameScene::changeTurn();
 	if (turn == right) {
-		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "changing");
+		state = GameState::external;
+		//切换回合后冷却一下再让AI下(否则看起来太突然)
+		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "changeCool");
+	}
+	else {
+		state = GameState::controlling;
 	}
 }
 
@@ -96,12 +93,13 @@ void PvaGameScene::AIMove()
 	if (times < 1) {
 		AIMovementTimes = 1;
 	}
-	else if (times>maxMovementTimes) {
+	else if (times > maxMovementTimes) {
 		AIMovementTimes = maxMovementTimes;
 	}
 	else {
 		AIMovementTimes = times;
 	}
-	beginMoving(AIMovingCol, getNextChessman());
+	setMovingCol(AIMovingCol);
+	move(getNextChessman());
 	AIMovementTimes--;
 }

@@ -10,5 +10,6 @@ const float boardScaleTime = 0.2f;//缩放动画时间
 
 enum Side { left, right };
 enum class Chessman { unknown, common, key, addCol, delCol, flip };
+enum class GameState { external, controlling, moving, cooling };
 enum class GameMode { pvp, pva, pvo };
 enum class EndGameReason { unknown, opponentLeft, youWin, youLose, timeOut };
