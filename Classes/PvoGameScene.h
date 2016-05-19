@@ -19,6 +19,7 @@ private:
 	DrawNode* timerStencilDrawNode;
 	LayerColor* timer;
 	bool firstMessage = true;
+	bool firstMove = true;
 
 	SIOClient* client;
 	bool disconnected = false;
@@ -45,8 +46,8 @@ private:
 	void onError(SIOClient* client, const std::string &data);
 	void onClose(SIOClient* client) {};
 	void onStart(SIOClient* client, const std::string &data);
-	void onTellNewChessman(SIOClient* client, const std::string &data);
-	void onBeginMoving(SIOClient* client, const std::string &data);
+	void onNewChessman(SIOClient* client, const std::string &data);
+	void onMove(SIOClient* client, const std::string &data);
 	void onChangeTurn(SIOClient* client, const std::string &data);
 	void onEndGame(SIOClient* client, const std::string &data);
 	void onDisconnected(SIOClient* client, const std::string &data);

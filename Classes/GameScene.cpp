@@ -52,6 +52,7 @@ bool GameScene::init()
 	eventDispatcher->addEventListenerWithSceneGraphPriority(ejectorTouchListener, this);
 
 	buildChessboard();
+	setTurn(left);
 	return true;
 }
 
@@ -367,6 +368,7 @@ void GameScene::endMoving()
 			break;
 		case Chessman::flip:
 			flip();
+			break;
 		}
 	}
 	updateChessboard();
@@ -384,13 +386,18 @@ void GameScene::endMoving()
 	}
 }
 
-void GameScene::changeTurn()
+void GameScene::setTurn(Side turn)
 {
-	turn = (turn == left ? right : left);
+	this->turn = turn;
 	setTurnFlag();
 	totalMovements = 0;
 	touching = false;
 	moveByControl = false;
+}
+
+void GameScene::changeTurn()
+{
+	setTurn(turn == left ? right : left);
 }
 
 void GameScene::leftWins()

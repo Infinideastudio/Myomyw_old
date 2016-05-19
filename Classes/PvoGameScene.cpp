@@ -29,8 +29,8 @@ bool PvoGameScene::init()
 		return false;
 	client->on("connect", CC_CALLBACK_2(PvoGameScene::onConnect, this));
 	client->on("start", CC_CALLBACK_2(PvoGameScene::onStart, this));
-	client->on("tellNewChessman", CC_CALLBACK_2(PvoGameScene::onTellNewChessman, this));
-	client->on("beginMoving", CC_CALLBACK_2(PvoGameScene::onBeginMoving, this));
+	client->on("newChessman", CC_CALLBACK_2(PvoGameScene::onNewChessman, this));
+	client->on("move", CC_CALLBACK_2(PvoGameScene::onMove, this));
 	client->on("changeTurn", CC_CALLBACK_2(PvoGameScene::onChangeTurn, this));
 	client->on("endGame", CC_CALLBACK_2(PvoGameScene::onEndGame, this));
 	client->on("disconnect", CC_CALLBACK_2(PvoGameScene::onDisconnected, this));
@@ -73,14 +73,22 @@ void PvoGameScene::buildChessboard()
 
 void PvoGameScene::beginMoving(int col, Chessman chessman)
 {
+	if (!started) {
+		return;
+	}
 	GameScene::beginMoving(col, chessman);
 	stopTimer();
-	if (turn == left) {
-		if (touching && !disconnected) {
+	if (turn == left && !disconnected) {
+		if (firstMove) {
 			Json j;
 			j.add("col", col);
-			client->emit("beginMoving", j.toString());
+			client->emit("move", j.toString());
+			firstMove = false;
 		}
+		else {
+			client->emit("move", "");
+		}
+
 	}
 }
 
@@ -104,7 +112,7 @@ void PvoGameScene::endMoving()
 void PvoGameScene::changeTurn()
 {
 	if (turn == left && !disconnected) {
-		client->emit("changeTurn", "");
+		client->emit("endTurn", "");
 	}
 	GameScene::changeTurn();
 	if (turn == left) {
@@ -139,7 +147,6 @@ void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	roomLabel->setString(Text::get("waiting"));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
-
 }
 
 void PvoGameScene::onError(SIOClient * client, const std::string & data)
@@ -153,7 +160,7 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 	started = true;
 	Json j(data);
 	if (j.getInt("side") == right) {
-		changeTurn();
+		setTurn(right);
 		state = GameState::external;
 	}
 	room = j.getInt("room");
@@ -165,13 +172,13 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 	startTimer();
 }
 
-void PvoGameScene::onTellNewChessman(SIOClient * client, const std::string & data)
+void PvoGameScene::onNewChessman(SIOClient * client, const std::string & data)
 {
 	Json j(data);
 	nextChessman = (Chessman)j.getInt("chessman");
 }
 
-void PvoGameScene::onBeginMoving(SIOClient * client, const std::string & data)
+void PvoGameScene::onMove(SIOClient * client, const std::string & data)
 {
 	if (turn == right) {
 		Json j(data);
@@ -192,6 +199,7 @@ void PvoGameScene::onChangeTurn(SIOClient * client, const std::string & data)
 {
 	if (turn == right) {
 		firstMessage = true;
+		firstMove = true;
 		//如果还在移动就设置shouldEndTurn为true，这样移动完成后就会切换回合
 		if (state == GameState::moving) {
 			shouldEndTurn = true;

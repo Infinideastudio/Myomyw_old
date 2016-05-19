@@ -27,23 +27,12 @@ protected:
 	Side turn = left;//当前回合
 	Chessman chessmen[maxLCol][maxRCol];//棋盘
 	GameState state = GameState::controlling;
-	bool touching = false;
-	bool moveByControl = false;//按下发射器引发的移动
-	int movingCol;//移动中的列
-	Chessman movingNewChessman;//移出来的新棋子
-	bool controlling;//是否正在控制
-	int totalMovements = 0;
-	bool externalColLock = false;//外部列锁,锁定后外部无法改变移动的列
-
 
 	void setNames(std::string left, std::string right);
 	virtual void setTurnFlag();
 	virtual void buildChessboard();
 	virtual void updateChessboard();
 	Sprite* createSpriteByChessman(Chessman type);
-
-	bool ejectorTouchBeganCallback(Touch* touch, Event* event);
-	void ejectorTouchEndedCallback(Touch* touch, Event* event);
 	//外部操作(外部就是不由玩家操作导致的移动)
 	void setMovingCol(int col);
 	void move(Chessman chessman);
@@ -52,12 +41,24 @@ protected:
 	virtual Chessman getNextChessman();
 	virtual void beginMoving(int col, Chessman chessman);
 	virtual void endMoving();
+	virtual void setTurn(Side turn);
 	virtual void changeTurn();
 	virtual void leftWins();
 	virtual void rightWins();
 private:
 	ClippingNode* stencil;//裁切节点
 	DrawNode* stencilDrawNode;//裁切模板图形
+
+	bool touching;
+	bool moveByControl;//按下发射器引发的移动
+	int movingCol;//移动中的列
+	Chessman movingNewChessman;//移出来的新棋子
+	int totalMovements;
+
+
+	bool externalColLock = false;//外部列锁,锁定后外部无法改变移动的列
+	bool ejectorTouchBeganCallback(Touch* touch, Event* event);
+	void ejectorTouchEndedCallback(Touch* touch, Event* event);
 	bool setBoardSize(int lCol, int rCol);
 	void flip();
 };
