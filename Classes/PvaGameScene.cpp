@@ -8,24 +8,22 @@ bool PvaGameScene::init()
 	if (!GameScene::init())
 		return false;
 	setNames(Player::getName(), Text::get("machine"));
+	controllable = true;
 	return true;
 }
 
 void PvaGameScene::endMoving()
 {
-	//下面的代码貌似能简化对吧，但别简化。。。
-	if (turn == right) {
-		GameScene::endMoving();
+	Side originalTurn = turn;//去除这次endMoving才变成right的情况
+	GameScene::endMoving();
+	if (originalTurn == right) {
 		if (AIMovementTimes > 0) {
 			AIMovementTimes--;
-			scheduleOnce([this](float) {GameScene::move(getNextChessman()); }, movingCooling, "cool");
+			scheduleOnce([this](float) {beginMoving(movingCol, getNextChessman()); }, movingCooling, "cool");
 		}
 		else {
 			changeTurn();
 		}
-	}
-	else {
-		GameScene::endMoving();
 	}
 }
 
@@ -33,12 +31,12 @@ void PvaGameScene::changeTurn()
 {
 	GameScene::changeTurn();
 	if (turn == right) {
-		state = GameState::external;
+		controllable = false;
 		//切换回合后冷却一下再让AI下(否则看起来太突然)
 		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "changeCool");
 	}
 	else {
-		state = GameState::controlling;
+		controllable = true;
 	}
 }
 
@@ -86,7 +84,7 @@ void PvaGameScene::AIMove()
 			bestCol = i;
 		}
 	}
-	AIMovingCol = bestCol;
+	movingCol = bestCol;
 	//移动次数根据权重而变
 	int times = round(5 * maxWeighting) + rand() % 3;
 	//确定实际移动次数
@@ -99,7 +97,6 @@ void PvaGameScene::AIMove()
 	else {
 		AIMovementTimes = times;
 	}
-	setMovingCol(AIMovingCol);
-	move(getNextChessman());
+	beginMoving(movingCol, getNextChessman());
 	AIMovementTimes--;
 }

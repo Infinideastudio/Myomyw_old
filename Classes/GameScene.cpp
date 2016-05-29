@@ -196,7 +196,7 @@ Sprite* GameScene::createSpriteByChessman(Chessman type)
 
 bool GameScene::ejectorTouchBeganCallback(Touch * touch, Event * event)
 {
-	if (state == GameState::controlling) {
+	if (controllable) {
 		//遍历当前边的发射器
 		for (int i = 0; i < (turn == left ? lCol : rCol); i++) {
 			//判断鼠标是否处于发射器内(45°倾斜的正方形)
@@ -207,7 +207,6 @@ bool GameScene::ejectorTouchBeganCallback(Touch * touch, Event * event)
 				point.x - point.y > -halfDiagonal &&
 				point.y - point.x > -halfDiagonal) {
 				touching = true;
-				moveByControl = true;
 				beginMoving(i, getNextChessman());
 			}
 		}
@@ -219,32 +218,8 @@ void GameScene::ejectorTouchEndedCallback(Touch * touch, Event * event)
 {
 	touching = false;
 	//如果正在冷却,那么立刻停止
-	if (moveByControl && state == GameState::cooling) {
+	if (controllable && state == ActionState::cooling) {
 		unschedule("cool");
-		changeTurn();
-	}
-}
-
-void GameScene::setMovingCol(int col)
-{
-	if (!externalColLock && state == GameState::external) {
-		movingCol = col;
-		externalColLock = true;
-		moveByControl = false;
-	}
-}
-
-void GameScene::move(Chessman chessman)
-{
-	if (externalColLock && totalMovements < maxMovementTimes) {
-		beginMoving(movingCol, chessman);
-	}
-}
-
-void GameScene::endTurn()
-{
-	if (externalColLock) {
-		externalColLock = false;
 		changeTurn();
 	}
 }
@@ -309,8 +284,8 @@ Chessman GameScene::getNextChessman()
 
 void GameScene::beginMoving(int col, Chessman chessman)
 {
-	if (state != GameState::moving) {
-		state = GameState::moving;
+	if (state != ActionState::moving) {
+		state = ActionState::moving;
 		movingCol = col;
 		movingNewChessman = chessman;
 		auto newChessman = createSpriteByChessman(chessman);
@@ -372,17 +347,17 @@ void GameScene::endMoving()
 		}
 	}
 	updateChessboard();
-	if (moveByControl) {
+	if (controllable) {
 		if (touching && totalMovements < maxMovementTimes) {
 			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol, getNextChessman()), movingCooling, "cool");
-			state = GameState::cooling;
+			state = ActionState::cooling;
 		}
 		else {
 			changeTurn();
 		}
 	}
 	else {
-		state = GameState::external;
+		state = ActionState::nothing;
 	}
 }
 
@@ -392,7 +367,7 @@ void GameScene::setTurn(Side turn)
 	setTurnFlag();
 	totalMovements = 0;
 	touching = false;
-	moveByControl = false;
+	state = ActionState::nothing;
 }
 
 void GameScene::changeTurn()

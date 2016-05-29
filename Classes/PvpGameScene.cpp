@@ -6,11 +6,6 @@ bool PvpGameScene::init()
 	if (!GameScene::init())
 		return false;
 	setNames(Text::get("green"), Text::get("blue"));
+	controllable = true;
 	return true;
-}
-
-void PvpGameScene::changeTurn()
-{
-	GameScene::changeTurn();
-	state = GameState::controlling;
 }

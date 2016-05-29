@@ -73,9 +73,6 @@ void PvoGameScene::buildChessboard()
 
 void PvoGameScene::beginMoving(int col, Chessman chessman)
 {
-	if (!started) {
-		return;
-	}
 	GameScene::beginMoving(col, chessman);
 	stopTimer();
 	if (turn == left && !disconnected) {
@@ -97,13 +94,13 @@ void PvoGameScene::endMoving()
 	GameScene::endMoving();
 	if (!movementBuffer.empty()) {
 		scheduleOnce([this](float) {
-			move(movementBuffer.back());
+			beginMoving(movingCol, movementBuffer.back());
 			movementBuffer.pop_back();
 		}, movingCooling, "cool");
 	}
 	else {
 		if (shouldEndTurn) {
-			endTurn();
+			changeTurn();
 			shouldEndTurn = false;
 		}
 	}
@@ -116,10 +113,10 @@ void PvoGameScene::changeTurn()
 	}
 	GameScene::changeTurn();
 	if (turn == left) {
-		state = GameState::controlling;
+		controllable = true;
 	}
 	else {
-		state = GameState::external;
+		controllable = false;
 	}
 	time = timeLimit;
 	startTimer();
@@ -157,11 +154,13 @@ void PvoGameScene::onError(SIOClient * client, const std::string & data)
 
 void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 {
-	started = true;
 	Json j(data);
 	if (j.getInt("side") == right) {
 		setTurn(right);
-		state = GameState::external;
+		controllable = false;
+	}
+	else {
+		controllable = true;
 	}
 	room = j.getInt("room");
 	roomLabel->setString(Text::get("room") + std::to_string(room));
@@ -183,14 +182,14 @@ void PvoGameScene::onMove(SIOClient * client, const std::string & data)
 	if (turn == right) {
 		Json j(data);
 		if (firstMessage) {
-			setMovingCol(j.getInt("col"));
+			movingCol = j.getInt("col");
 			firstMessage = false;
 		}
-		if (state == GameState::moving) {
+		if (state == ActionState::moving) {
 			movementBuffer.push_back((Chessman)j.getInt("chessman"));
 		}
 		else {
-			move((Chessman)j.getInt("chessman"));
+			beginMoving(movingCol, (Chessman)j.getInt("chessman"));
 		}
 	}
 }
@@ -201,11 +200,11 @@ void PvoGameScene::onChangeTurn(SIOClient * client, const std::string & data)
 		firstMessage = true;
 		firstMove = true;
 		//如果还在移动就设置shouldEndTurn为true，这样移动完成后就会切换回合
-		if (state == GameState::moving) {
+		if (state == ActionState::moving) {
 			shouldEndTurn = true;
 		}
 		else {
-			endTurn();
+			changeTurn();
 		}
 	}
 }

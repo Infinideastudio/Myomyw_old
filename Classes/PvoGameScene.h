@@ -24,7 +24,6 @@ private:
 	SIOClient* client;
 	bool disconnected = false;
 	bool shouldEndTurn = false;
-	bool started = false;
 	std::vector<Chessman> movementBuffer;//传入移动时的缓冲
 	Chessman nextChessman;//服务器提供的下一个新球
 	int room;

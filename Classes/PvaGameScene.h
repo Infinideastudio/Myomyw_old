@@ -9,7 +9,6 @@ public:
 	CREATE_FUNC(PvaGameScene);
 private:
 	int AIMovementTimes;
-	int AIMovingCol;
 	void endMoving();
 	void changeTurn();
 	void leftWins();
