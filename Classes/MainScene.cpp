@@ -2,6 +2,7 @@
 #include "PvpGameScene.h"
 #include "PvaGameScene.h"
 #include "PvoGameScene.h"
+#include "OptionScene.h"
 #include "Text.h"
 #include "Player.h"
 USING_NS_CC;
@@ -17,18 +18,28 @@ bool MainScene::init()
 	background->setScale(scale);
 	background->setPosition(visibleSize.width / 2, visibleSize.height - background->getContentSize().height * scale * 0.5);
 	this->addChild(background);
-	//--总界面层--//
-	uiLayer = Layer::create();
+
+	auto optionItem = MenuItemImage::create("UI/OptionNormal.png", "Ui/OptionSelected.png", [](Ref* pSender) {
+		Director::getInstance()->replaceScene(TransitionFlipX::create(0.5f, OptionScene::create()));
+	});
+	optionItem->setPosition((Vec2)optionItem->getContentSize() / 2 + Vec2(10, 10));
+	//--固定菜单--//
+	auto fixedMenu = Menu::create(optionItem, NULL);
+	fixedMenu->setPosition(Vec2::ZERO);
+	this->addChild(fixedMenu);
+	//--滑动界面层--//
+	scrollableLayer = Layer::create();
 	if (Player::isLogged()) {
-		uiLayer->setPosition(-visibleSize.width, 0);
+		scrollableLayer->setPosition(-visibleSize.width, 0);
 	}
-	this->addChild(uiLayer);
+	this->addChild(scrollableLayer);
 	//--登录界面层--//
 	auto loginLayer = Layer::create();
-	uiLayer->addChild(loginLayer);
-	auto captionLabel = Text::createLabel(Text::get("loginCaption"), 40, Color4B(0, 0, 0, 255));
-	captionLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
-	loginLayer->addChild(captionLabel);
+	scrollableLayer->addChild(loginLayer);
+	//--标题--//
+	auto titleLabel = Text::createLabel(Text::get("loginTitle"), 40, Color4B::BLACK);
+	titleLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
+	loginLayer->addChild(titleLabel);
 
 	nameBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
 	nameBox->setFontColor(Color4B(0, 0, 0, 255));
@@ -65,7 +76,7 @@ bool MainScene::init()
 	//--主界面层--//
 	auto mainLayer = Layer::create();
 	mainLayer->setPosition(Vec2(visibleSize.width, 0));
-	uiLayer->addChild(mainLayer);
+	scrollableLayer->addChild(mainLayer);
 
 	auto pvpLabel = Text::createLabel(Text::get("pvp"), 32, Color4B(30, 100, 30, 255));
 	auto pvpItem = MenuItemLabel::create(pvpLabel, [](Ref* pSender)
@@ -111,7 +122,7 @@ void MainScene::moveToMainLayer()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	auto moveAction = MoveTo::create(1, Vec2(-visibleSize.width, 0));
 	auto easeAction = EaseExponentialInOut::create(moveAction);
-	uiLayer->runAction(easeAction);
+	scrollableLayer->runAction(easeAction);
 	pvoItem->setEnabled(!Player::isGuest());
 	updatePlayerLabel();
 }
@@ -120,7 +131,7 @@ void MainScene::moveToLoginLayer()
 {
 	auto moveAction = MoveTo::create(1, Vec2::ZERO);
 	auto easeAction = EaseExponentialInOut::create(moveAction);
-	uiLayer->runAction(easeAction);
+	scrollableLayer->runAction(easeAction);
 }
 
 void MainScene::updatePlayerLabel()

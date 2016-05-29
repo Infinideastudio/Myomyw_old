@@ -10,7 +10,7 @@ public:
 	CREATE_FUNC(MainScene);
 private:
 	ui::EditBox *nameBox, *addressBox;
-	Layer* uiLayer;
+	Layer* scrollableLayer;
 	Label* playerLabel;
 	MenuItemLabel* pvoItem;
 

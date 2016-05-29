@@ -1,4 +1,4 @@
-loginCaption=Please Log In
+loginTitle=Please Log In
 enterName=Enter your name
 enterAddress=Enter server address
 login=Login
@@ -7,6 +7,7 @@ guest=Guest
 notLogged=Not Logged
 serverName=Sever name:
 logout=Logout
+optionTitle=Options
 pvp=Two Players
 pva=Man-Machine
 pvo=Netplay

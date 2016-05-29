@@ -1,4 +1,4 @@
-loginCaption=请登录
+loginTitle=请登录
 enterName=输入昵称
 enterAddress=输入服务器地址
 login=登录
@@ -7,6 +7,7 @@ guest=游客
 notLogged=未登录
 serverName=服务器名称:
 logout=注销
+optionTitle=选项
 pvp=单机双人
 pva=人机对战
 pvo=网络对战
