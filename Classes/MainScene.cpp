@@ -70,7 +70,7 @@ bool MainScene::init()
 	});
 	guestItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 200);
 
-	auto loginMenu = Menu::create(loginItem, guestItem, NULL);
+	loginMenu = Menu::create(loginItem, guestItem, NULL);
 	loginMenu->setPosition(Vec2::ZERO);
 	loginLayer->addChild(loginMenu);
 	//--Ö÷½çÃæ²ã--//
@@ -101,8 +101,9 @@ bool MainScene::init()
 	});
 	logoutItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 200);
 
-	auto mainMenu = Menu::create(pvpItem, pvaItem, pvoItem, logoutItem, NULL);
+	mainMenu = Menu::create(pvpItem, pvaItem, pvoItem, logoutItem, NULL);
 	mainMenu->setPosition(Vec2::ZERO);
+	mainMenu->setEnabled(false);
 	mainLayer->addChild(mainMenu);
 
 	playerLabel = Text::createLabel("", 25, Color4B(0, 0, 0, 255));
@@ -129,6 +130,8 @@ void MainScene::moveToMainLayer()
 
 void MainScene::moveToLoginLayer()
 {
+	loginMenu->setEnabled(true);
+	mainMenu->setEnabled(false);
 	auto moveAction = MoveTo::create(1, Vec2::ZERO);
 	auto easeAction = EaseExponentialInOut::create(moveAction);
 	scrollableLayer->runAction(easeAction);
@@ -137,6 +140,8 @@ void MainScene::moveToLoginLayer()
 void MainScene::updatePlayerLabel()
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
+	loginMenu->setEnabled(false);
+	mainMenu->setEnabled(true);
 	auto str = Player::getName();
 	if (!Player::isGuest()) {
 		str.append("  ");

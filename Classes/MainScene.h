@@ -13,6 +13,7 @@ private:
 	Layer* scrollableLayer;
 	Label* playerLabel;
 	MenuItemLabel* pvoItem;
+	Menu *loginMenu, *mainMenu;
 
 	void moveToMainLayer();
 	void moveToLoginLayer();
