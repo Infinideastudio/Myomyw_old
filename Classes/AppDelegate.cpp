@@ -64,15 +64,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	searchPaths.push_back("res/");
 	FileUtils::getInstance()->setSearchPaths(searchPaths);
 	srand(unsigned(time(0)));
-	switch (Application::getInstance()->getCurrentLanguage()) {
-	case LanguageType::CHINESE:
-		Text::loadLang("zh_CN");
-		break;
-	case LanguageType::ENGLISH:
-	default:
-		Text::loadLang("en_US");
-		break;
-	}
+	Text::init();
 
 	auto scene = MainScene::create();
 

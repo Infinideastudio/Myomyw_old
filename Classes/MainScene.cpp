@@ -19,7 +19,7 @@ bool MainScene::init()
 	background->setPosition(visibleSize.width / 2, visibleSize.height - background->getContentSize().height * scale * 0.5);
 	this->addChild(background);
 
-	auto optionItem = MenuItemImage::create("UI/OptionNormal.png", "Ui/OptionSelected.png", [](Ref* pSender) {
+	auto optionItem = MenuItemImage::create("UI/OptionNormal.png", "UI/OptionSelected.png", [](Ref* pSender) {
 		Director::getInstance()->replaceScene(TransitionFlipX::create(0.5f, OptionScene::create()));
 	});
 	optionItem->setPosition((Vec2)optionItem->getContentSize() / 2 + Vec2(10, 10));
@@ -42,14 +42,14 @@ bool MainScene::init()
 	loginLayer->addChild(titleLabel);
 
 	nameBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
-	nameBox->setFontColor(Color4B(0, 0, 0, 255));
+	nameBox->setFontColor(Color4B::BLACK);
 	nameBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 50));
 	nameBox->setPlaceHolder(Text::get("enterName").c_str());
 	nameBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
 	loginLayer->addChild(nameBox);
 
 	addressBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
-	addressBox->setFontColor(Color4B(0, 0, 0, 255));
+	addressBox->setFontColor(Color4B::BLACK);
 	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 50));
 	addressBox->setPlaceHolder(Text::get("enterAddress").c_str());
 	addressBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
