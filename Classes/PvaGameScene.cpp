@@ -8,8 +8,15 @@ bool PvaGameScene::init()
 	if (!GameScene::init())
 		return false;
 	setNames(Player::getName(), Text::get("machine"));
+	setNextChessman(getRandomchessman());
 	controllable = true;
 	return true;
+}
+
+void PvaGameScene::beginMoving(int col)
+{
+	GameScene::beginMoving(col);
+	setNextChessman(getRandomchessman());
 }
 
 void PvaGameScene::endMoving()
@@ -19,7 +26,7 @@ void PvaGameScene::endMoving()
 	if (originalTurn == right) {
 		if (AIMovementTimes > 0) {
 			AIMovementTimes--;
-			scheduleOnce([this](float) {beginMoving(movingCol, getNextChessman()); }, movingCooling, "cool");
+			scheduleOnce([this](float) {beginMoving(movingCol); }, movingCooling, "cool");
 		}
 		else {
 			changeTurn();
@@ -97,6 +104,6 @@ void PvaGameScene::AIMove()
 	else {
 		AIMovementTimes = times;
 	}
-	beginMoving(movingCol, getNextChessman());
+	beginMoving(movingCol);
 	AIMovementTimes--;
 }

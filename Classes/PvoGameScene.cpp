@@ -29,7 +29,7 @@ bool PvoGameScene::init()
 		return false;
 	client->on("connect", CC_CALLBACK_2(PvoGameScene::onConnect, this));
 	client->on("start", CC_CALLBACK_2(PvoGameScene::onStart, this));
-	client->on("newChessman", CC_CALLBACK_2(PvoGameScene::onNewChessman, this));
+	client->on("nextChessman", CC_CALLBACK_2(PvoGameScene::onNextChessman, this));
 	client->on("move", CC_CALLBACK_2(PvoGameScene::onMove, this));
 	client->on("changeTurn", CC_CALLBACK_2(PvoGameScene::onChangeTurn, this));
 	client->on("endGame", CC_CALLBACK_2(PvoGameScene::onEndGame, this));
@@ -71,9 +71,9 @@ void PvoGameScene::buildChessboard()
 	timerStencilDrawNode->drawSolidPoly(stencilPoly, 4, Color4F(1.0, 1.0, 1.0, 1.0));
 }
 
-void PvoGameScene::beginMoving(int col, Chessman chessman)
+void PvoGameScene::beginMoving(int col)
 {
-	GameScene::beginMoving(col, chessman);
+	GameScene::beginMoving(col);
 	stopTimer();
 	if (turn == left && !disconnected) {
 		if (firstMove) {
@@ -92,17 +92,9 @@ void PvoGameScene::beginMoving(int col, Chessman chessman)
 void PvoGameScene::endMoving()
 {
 	GameScene::endMoving();
-	if (!movementBuffer.empty()) {
-		scheduleOnce([this](float) {
-			beginMoving(movingCol, movementBuffer.back());
-			movementBuffer.pop_back();
-		}, movingCooling, "cool");
-	}
-	else {
-		if (shouldEndTurn) {
-			changeTurn();
-			shouldEndTurn = false;
-		}
+	if (shouldEndTurn) {
+		changeTurn();
+		shouldEndTurn = false;
 	}
 }
 
@@ -120,11 +112,6 @@ void PvoGameScene::changeTurn()
 	}
 	time = timeLimit;
 	startTimer();
-}
-
-Chessman PvoGameScene::getNextChessman()
-{
-	return nextChessman;
 }
 
 void PvoGameScene::leftWins()
@@ -171,10 +158,10 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 	startTimer();
 }
 
-void PvoGameScene::onNewChessman(SIOClient * client, const std::string & data)
+void PvoGameScene::onNextChessman(SIOClient * client, const std::string & data)
 {
 	Json j(data);
-	nextChessman = (Chessman)j.getInt("chessman");
+	setNextChessman((Chessman)j.getInt("chessman"));
 }
 
 void PvoGameScene::onMove(SIOClient * client, const std::string & data)
@@ -185,11 +172,8 @@ void PvoGameScene::onMove(SIOClient * client, const std::string & data)
 			movingCol = j.getInt("col");
 			firstMessage = false;
 		}
-		if (state == ActionState::moving) {
-			movementBuffer.push_back((Chessman)j.getInt("chessman"));
-		}
-		else {
-			beginMoving(movingCol, (Chessman)j.getInt("chessman"));
+		if (state != ActionState::moving) {
+			beginMoving(movingCol);
 		}
 	}
 }

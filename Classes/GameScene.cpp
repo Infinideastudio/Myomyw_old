@@ -9,8 +9,6 @@ bool GameScene::init()
 	if (!Scene::init())
 		return false;
 
-    nextChessman = getNextChessman();
-
 	//--初始化棋子数组--//
 	for (int i = 0; i < maxLCol; i++) {
 		for (int j = 0; j < maxRCol; j++) {
@@ -46,10 +44,6 @@ bool GameScene::init()
 	this->addChild(leftNameLabel);
 	rightNameLabel = Text::createLabel("", 26, Color4B(0, 0, 0, 255));
 	this->addChild(rightNameLabel);
-    //--下一个棋子提示--//
-    auto nextChessmanLabel = Text::createLabel(Text::get("Nextchessman"), 25, Color4B(0, 0, 0, 255));
-    nextChessmanLabel->setPosition(120, getContentSize().height - 80);
-    this->addChild(nextChessmanLabel);
 	//--设置回调--//
 	auto ejectorTouchListener = EventListenerTouchOneByOne::create();//<-这个只是添加到Layer
 	ejectorTouchListener->onTouchBegan = CC_CALLBACK_2(GameScene::ejectorTouchBeganCallback, this);
@@ -71,6 +65,17 @@ void GameScene::setNames(std::string left, std::string right)
 	leftNameLabel->setPosition(Vec2(leftNameLabel->getContentSize().width, visibleSize.height - leftNameLabel->getContentSize().height));
 	rightNameLabel->setString(right);
 	rightNameLabel->setPosition(Vec2(visibleSize.width - rightNameLabel->getContentSize().width, visibleSize.height - rightNameLabel->getContentSize().height));
+}
+
+void GameScene::setNextChessman(Chessman chessman)
+{
+	nextChessman = chessman;
+	this->removeChildByName("next");
+	auto nextChessmanSprite = createSpriteByChessman(nextChessman);
+	nextChessmanSprite->setScale(0.8f);
+	nextChessmanSprite->setPosition((Vec2)this->getContentSize() - Vec2(50, 80));
+	nextChessmanSprite->setName("next");
+	this->addChild(nextChessmanSprite);
 }
 
 //设置回合标志
@@ -172,13 +177,8 @@ void GameScene::updateChessboard()
 			chessman->setPosition(((r - l)*halfDiagonal + topVertex.x), drawLength - (l + r + 3)*halfDiagonal);
 			chessman->setTag(l*rCol + r);
 			chessmanNode->addChild(chessman);
-        }
+		}
 	}
-    this->removeChildByName("nextchessman");
-    auto nxtchessman = createSpriteByChessman(nextChessman);
-    nxtchessman->setPosition(50, this->getContentSize().height-150);
-    nxtchessman->setName("nextchessman");
-    this->addChild(nxtchessman);
 }
 
 Sprite* GameScene::createSpriteByChessman(Chessman type)
@@ -220,8 +220,7 @@ bool GameScene::ejectorTouchBeganCallback(Touch * touch, Event * event)
 				point.x - point.y > -halfDiagonal &&
 				point.y - point.x > -halfDiagonal) {
 				touching = true;
-				beginMoving(i, nextChessman);
-                nextChessman = getNextChessman();
+				beginMoving(i);
 			}
 		}
 	}
@@ -279,7 +278,7 @@ void GameScene::flip()
 	buildChessboard();
 }
 
-Chessman GameScene::getNextChessman()
+Chessman GameScene::getRandomchessman()
 {
 	switch (rand() % 10)
 	{
@@ -296,13 +295,13 @@ Chessman GameScene::getNextChessman()
 	}
 }
 
-void GameScene::beginMoving(int col, Chessman chessman)
+void GameScene::beginMoving(int col)
 {
 	if (state != ActionState::moving) {
 		state = ActionState::moving;
 		movingCol = col;
-		movingNewChessman = chessman;
-		auto newChessman = createSpriteByChessman(chessman);
+		movingNewChessman = nextChessman;
+		auto newChessman = createSpriteByChessman(movingNewChessman);
 		newChessman->setPosition(((turn == left ? -movingCol - 1 : movingCol + 1) * halfDiagonal + topVertex.x), drawLength - (movingCol + 2)*halfDiagonal);
 		chessmanNode->addChild(newChessman);
 		auto movingAction = MoveBy::create(movingTime, Vec2(turn == left ? halfDiagonal : -halfDiagonal, -halfDiagonal));
@@ -363,8 +362,7 @@ void GameScene::endMoving()
 	updateChessboard();
 	if (controllable) {
 		if (touching && totalMovements < maxMovementTimes) {
-			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol, nextChessman), movingCooling, "cool");
-            nextChessman = getNextChessman();
+			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol), movingCooling, "cool");
 			state = ActionState::cooling;
 		}
 		else {

@@ -15,7 +15,7 @@ function Room(onClose) {
     this.turn = left;
     this.leftPlayer = null;
     this.rightPlayer = null;
-    this.newChessman = null;
+    this.nextChessman = null;
     this.movingCol = null;
     this.over = false;
     this.totalMovementTimes = 0;
@@ -38,6 +38,7 @@ Room.prototype.setPlayer = function (side, socket) {
 }
 
 Room.prototype.start = function (turn) {
+    this.createAndTellNextChessman();
     this.leftPlayer.emit('start', { side: left });
     this.rightPlayer.emit('start', { side: right });
     this.setTurn(turn);
@@ -60,8 +61,8 @@ Room.prototype.onMove = function (side, data) {
     }
     if (this.movingCol != null && this.totalMovementTimes < config.maxMovementTimes) {
         this.totalMovementTimes++;
-        room.waitingPlayer().emit('move', { col: data.col, chessman: room.newChessman });
-        if (this.move(this.movingCol, this.newChessman)) {
+        room.waitingPlayer().emit('move', { col: data.col });
+        if (this.move(this.movingCol, this.nextChessman)) {
             this.currentPlayer().emit('endGame', { reason: EndReason.youWin });
             this.waitingPlayer().emit('endGame', { reason: EndReason.youLose });
             clearTimeout(this.timeOutHandle);
@@ -73,20 +74,17 @@ Room.prototype.onMove = function (side, data) {
             clearTimeout(this.timeOutHandle);
             //此举是为了防止两次移动间间隔时间过长
             this.timeOutHandle = setTimeout(this.timeOut.bind(this), config.maxInterval);
-            this.newChessman = this.getRandomChessman();
-            this.currentPlayer().emit('newChessman', { chessman: this.newChessman });
+            this.createAndTellNextChessman();
         }
     }
 }
 
 Room.prototype.onEndTurn = function (side) {
-    console.log('onEndTurn');
     if (side != this.turn) { return; }
     if (this.movingCol != null) {
         this.movingCol = null;
         this.setTurn(this.turn == left ? right : left);
         this.currentPlayer().emit('changeTurn');
-        console.log('sent');
     }
 }
 
@@ -105,14 +103,19 @@ Room.prototype.setTurn = function (turn) {
     this.totalMovementTimes = 0;
     clearTimeout(this.timeOutHandle);
     this.timeOutHandle = setTimeout(this.timeOut.bind(this), config.timeLimit);
-    this.newChessman = this.getRandomChessman();
-    this.currentPlayer().emit('newChessman', { chessman: this.newChessman });
 }
 
 Room.prototype.timeOut = function () {
     this.leftPlayer.emit('endGame', { reason: EndReason.timeOut });
     this.rightPlayer.emit('endGame', { reason: EndReason.timeOut });
     this.close();
+}
+
+Room.prototype.createAndTellNextChessman = function () {
+    this.nextChessman = this.getRandomChessman();
+    this.leftPlayer.emit('nextChessman', { chessman: this.nextChessman });
+    this.rightPlayer.emit('nextChessman', { chessman: this.nextChessman });
+    console.log('told');
 }
 
 Room.prototype.getRandomChessman = function () {
@@ -160,7 +163,7 @@ Room.prototype.move = function (col, chessman) {
         for (var i = this.rCol - 1; i > 0; i--) {
             this.chessmen[col][i] = this.chessmen[col][i - 1];
         }
-        this.chessmen[col][0] = this.newChessman;
+        this.chessmen[col][0] = this.nextChessman;
         switch (lastChessman) {
             case Chessman.key:
                 return true;
@@ -181,7 +184,7 @@ Room.prototype.move = function (col, chessman) {
         for (var i = this.lCol - 1; i > 0; i--) {
             this.chessmen[i][col] = this.chessmen[i - 1][col];
         }
-        this.chessmen[0][col] = this.newChessman;
+        this.chessmen[0][col] = this.nextChessman;
         switch (lastChessman) {
             case Chessman.key:
                 return true;
@@ -218,7 +221,7 @@ function parseJSON(text) {
         try {
             var obj = JSON.parse(text);
             return obj;
-        } 
+        }
         catch (e) {
             return {};
         }

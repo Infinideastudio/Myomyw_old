@@ -31,12 +31,14 @@ protected:
 	bool controllable = false;
 
 	void setNames(std::string left, std::string right);
+	Chessman getNextChessman() { return nextChessman; };
+	void setNextChessman(Chessman chessman);
 	virtual void setTurnFlag();
 	virtual void buildChessboard();
 	virtual void updateChessboard();
-	Sprite* createSpriteByChessman(Chessman type);
-	virtual Chessman getNextChessman();
-	virtual void beginMoving(int col, Chessman chessman);
+	virtual Sprite* createSpriteByChessman(Chessman type);
+	Chessman getRandomchessman();
+	virtual void beginMoving(int col);
 	virtual void endMoving();
 	virtual void setTurn(Side turn);
 	virtual void changeTurn();
@@ -48,7 +50,7 @@ private:
 
 	bool touching = false;
 	Chessman movingNewChessman;//移出来的新棋子
-    Chessman nextChessman;//下一个棋子
+	Chessman nextChessman;//下一个棋子
 	int totalMovements;
 
 	bool ejectorTouchBeganCallback(Touch* touch, Event* event);

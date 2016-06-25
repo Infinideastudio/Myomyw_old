@@ -24,8 +24,6 @@ private:
 	SIOClient* client;
 	bool disconnected = false;
 	bool shouldEndTurn = false;
-	std::vector<Chessman> movementBuffer;//传入移动时的缓冲
-	Chessman nextChessman;//服务器提供的下一个新球
 	int room;
 	EndGameReason endGameReason;
 	float time = timeLimit;
@@ -34,10 +32,9 @@ private:
 	void stopTimer();
 	void setTurnFlag();
 	void buildChessboard();
-	void beginMoving(int col, Chessman chessman);
+	void beginMoving(int col);
 	void endMoving();
 	void changeTurn();
-	Chessman getNextChessman();
 	void leftWins();
 	void rightWins();
 
@@ -45,7 +42,7 @@ private:
 	void onError(SIOClient* client, const std::string &data);
 	void onClose(SIOClient* client) {};
 	void onStart(SIOClient* client, const std::string &data);
-	void onNewChessman(SIOClient* client, const std::string &data);
+	void onNextChessman(SIOClient* client, const std::string &data);
 	void onMove(SIOClient* client, const std::string &data);
 	void onChangeTurn(SIOClient* client, const std::string &data);
 	void onEndGame(SIOClient* client, const std::string &data);
