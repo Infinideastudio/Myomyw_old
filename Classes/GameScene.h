@@ -48,6 +48,7 @@ private:
 
 	bool touching = false;
 	Chessman movingNewChessman;//移出来的新棋子
+    Chessman nextChessman;//下一个棋子
 	int totalMovements;
 
 	bool ejectorTouchBeganCallback(Touch* touch, Event* event);

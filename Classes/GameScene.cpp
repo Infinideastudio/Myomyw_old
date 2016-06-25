@@ -8,6 +8,9 @@ bool GameScene::init()
 {
 	if (!Scene::init())
 		return false;
+
+    nextChessman = getNextChessman();
+
 	//--初始化棋子数组--//
 	for (int i = 0; i < maxLCol; i++) {
 		for (int j = 0; j < maxRCol; j++) {
@@ -43,6 +46,10 @@ bool GameScene::init()
 	this->addChild(leftNameLabel);
 	rightNameLabel = Text::createLabel("", 26, Color4B(0, 0, 0, 255));
 	this->addChild(rightNameLabel);
+    //--下一个棋子提示--//
+    auto nextChessmanLabel = Text::createLabel(Text::get("Nextchessman"), 25, Color4B(0, 0, 0, 255));
+    nextChessmanLabel->setPosition(120, getContentSize().height - 80);
+    this->addChild(nextChessmanLabel);
 	//--设置回调--//
 	auto ejectorTouchListener = EventListenerTouchOneByOne::create();//<-这个只是添加到Layer
 	ejectorTouchListener->onTouchBegan = CC_CALLBACK_2(GameScene::ejectorTouchBeganCallback, this);
@@ -53,6 +60,7 @@ bool GameScene::init()
 
 	buildChessboard();
 	setTurn(left);
+
 	return true;
 }
 
@@ -164,8 +172,13 @@ void GameScene::updateChessboard()
 			chessman->setPosition(((r - l)*halfDiagonal + topVertex.x), drawLength - (l + r + 3)*halfDiagonal);
 			chessman->setTag(l*rCol + r);
 			chessmanNode->addChild(chessman);
-		}
+        }
 	}
+    this->removeChildByName("nextchessman");
+    auto nxtchessman = createSpriteByChessman(nextChessman);
+    nxtchessman->setPosition(50, this->getContentSize().height-150);
+    nxtchessman->setName("nextchessman");
+    this->addChild(nxtchessman);
 }
 
 Sprite* GameScene::createSpriteByChessman(Chessman type)
@@ -207,7 +220,8 @@ bool GameScene::ejectorTouchBeganCallback(Touch * touch, Event * event)
 				point.x - point.y > -halfDiagonal &&
 				point.y - point.x > -halfDiagonal) {
 				touching = true;
-				beginMoving(i, getNextChessman());
+				beginMoving(i, nextChessman);
+                nextChessman = getNextChessman();
 			}
 		}
 	}
@@ -349,7 +363,8 @@ void GameScene::endMoving()
 	updateChessboard();
 	if (controllable) {
 		if (touching && totalMovements < maxMovementTimes) {
-			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol, getNextChessman()), movingCooling, "cool");
+			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol, nextChessman), movingCooling, "cool");
+            nextChessman = getNextChessman();
 			state = ActionState::cooling;
 		}
 		else {
