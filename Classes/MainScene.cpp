@@ -93,6 +93,9 @@ bool MainScene::init()
 		Director::getInstance()->replaceScene(PvoGameScene::create());
 	});
 	pvoItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 100);
+	if (Player::isLogged()) {
+		pvoItem->setEnabled(false);
+	}
 
 	auto logoutLabel = Text::createLabel(Text::get("logout"), 25, Color4B(255, 0, 0, 255));
 	auto logoutItem = MenuItemLabel::create(logoutLabel, [this](Ref* pSender) {
