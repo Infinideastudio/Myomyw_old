@@ -1,5 +1,5 @@
 #include "PvaGameScene.h"
-#include "Text.h"
+#include "Lang.h"
 #include "Player.h"
 #include "ResultScene.h"
 
@@ -7,7 +7,7 @@ bool PvaGameScene::init()
 {
 	if (!GameScene::init())
 		return false;
-	setNames(Player::getName(), Text::get("machine"));
+	setNames(Player::getName(), Lang::get("machine"));
 	setNextChessman(getRandomchessman());
 	controllable = true;
 	return true;
@@ -49,13 +49,13 @@ void PvaGameScene::changeTurn()
 
 void PvaGameScene::leftWins()
 {
-	auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
+	auto rs = ResultScene::create(Lang::get("playerWins"), Color4B(0, 255, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void PvaGameScene::rightWins()
 {
-	auto rs = ResultScene::create(Text::get("aiWins"), Color4B(0, 0, 0, 255));
+	auto rs = ResultScene::create(Lang::get("aiWins"), Color4B(0, 0, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 

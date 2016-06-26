@@ -2,6 +2,8 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 USING_NS_CC;
+using namespace cocos2d::ui;
+
 class OptionScene :public Scene
 {
 public:

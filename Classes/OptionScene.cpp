@@ -1,6 +1,7 @@
 #include "OptionScene.h"
 #include "MainScene.h"
-#include "Text.h"
+#include "Lang.h"
+#include "MyCreator.h"
 USING_NS_CC;
 
 bool OptionScene::init()
@@ -18,12 +19,12 @@ bool OptionScene::init()
 	backMenu->setPosition(Vec2::ZERO);
 	this->addChild(backMenu);
 	//--¸ù²Ëµ¥--//
-	auto rootLayout = createLayout(Text::get("optionTitle"), this->getContentSize());
+	auto rootLayout = createLayout(Lang::get("optionTitle"), this->getContentSize());
 	this->addChild(rootLayout);
 
-	auto list = ui::ListView::create();
-	list->setDirection(ui::ScrollView::Direction::VERTICAL);
-	list->setGravity(ui::ListView::Gravity::CENTER_HORIZONTAL);
+	auto list = ListView::create();
+	list->setDirection(ScrollView::Direction::VERTICAL);
+	list->setGravity(ListView::Gravity::CENTER_HORIZONTAL);
 	list->setBounceEnabled(true);
 	list->setItemsMargin(10);
 	list->setContentSize(Size(700, 480));
@@ -31,31 +32,31 @@ bool OptionScene::init()
 	list->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 20));
 	rootLayout->addChild(list);
 	//--ÓïÑÔ°´Å¥--//
-	auto langButton = createButton(Text::get("selectLang"), Size(600, 60), [=](Ref* pSender) {
-		auto button = (ui::Button*)pSender;
-		auto langLayout = createLayout(Text::get("selectLang"), Size(600, 600));
-		auto langList = ui::ListView::create();
-		langList->setDirection(ui::ScrollView::Direction::VERTICAL);
+	auto langButton = createButton(Lang::get("selectLang"), Size(600, 60), [=](Ref* pSender) {
+		auto button = (Button*)pSender;
+		auto langLayout = createLayout(Lang::get("selectLang"), Size(600, 600));
+		auto langList = ListView::create();
+		langList->setDirection(ScrollView::Direction::VERTICAL);
 		langList->setItemsMargin(10);
-		langList->setGravity(ui::ListView::Gravity::CENTER_HORIZONTAL);
+		langList->setGravity(ListView::Gravity::CENTER_HORIZONTAL);
 		langList->setBounceEnabled(true);
 		langList->setContentSize(Size(600, 480));
 		langList->setAnchorPoint(Vec2(0.5f, 0.5f));
 		langList->setPosition(Vec2(langLayout->getContentSize().width / 2, langLayout->getContentSize().height / 2 - 20));
 		langLayout->addChild(langList);
-		auto langs = Text::getAllLangs();
+		auto langs = Lang::getAllLangs();
 
-		auto autoLangButton = createButton(Text::get("autoLang"), Size(500, 60), [this](Ref* pSender) {
-			auto button = static_cast<ui::Button*> (pSender);
+		auto autoLangButton = createButton(Lang::get("autoLang"), Size(500, 60), [this](Ref* pSender) {
+			auto button = static_cast<Button*> (pSender);
 			highlightingButton->loadTextureNormal("UI/ButtonNormal.png");
 			highlightingButton->setContentSize(Size(500, 60));
 			highlightingButton = button;
 			button->loadTextureNormal("UI/ButtonActive.png");
 			button->setContentSize(Size(500, 60));
-			Text::setAutoLang(true);
-			Text::loadAutoLang();
+			Lang::setAutoLang(true);
+			Lang::loadAutoLang();
 		});
-		if (Text::isAutoLang()) {
+		if (Lang::isAutoLang()) {
 			autoLangButton->loadTextureNormal("UI/ButtonActive.png");
 			autoLangButton->setContentSize(Size(500, 60));
 			highlightingButton = autoLangButton;
@@ -63,16 +64,16 @@ bool OptionScene::init()
 		langList->addChild(autoLangButton);
 		for (auto i : langs) {
 			auto langButton = createButton(i.first, Size(500, 60), [i, this](Ref* pSender) {
-				auto button = static_cast<ui::Button*> (pSender);
+				auto button = static_cast<Button*> (pSender);
 				highlightingButton->loadTextureNormal("UI/ButtonNormal.png");
 				highlightingButton->setContentSize(Size(500, 60));
 				highlightingButton = button;
 				button->loadTextureNormal("UI/ButtonActive.png");
 				button->setContentSize(Size(500, 60));
-				Text::setAutoLang(false);
-				Text::loadLang(i.second);
+				Lang::setAutoLang(false);
+				Lang::loadLang(i.second);
 			});
-			if (!Text::isAutoLang() && i.second == Text::getCurrentLang()) {
+			if (!Lang::isAutoLang() && i.second == Lang::getCurrentLang()) {
 				langButton->loadTextureNormal("UI/ButtonActive.png");
 				langButton->setContentSize(Size(500, 60));
 				highlightingButton = langButton;
@@ -90,11 +91,11 @@ bool OptionScene::init()
 	return true;
 }
 
-ui::Button* OptionScene::createButton(std::string text, Size size, std::function<void(Ref*)> callback)
+Button* OptionScene::createButton(std::string text, Size size, std::function<void(Ref*)> callback)
 {
-	auto button = ui::Button::create("UI/ButtonNormal.png", "UI/ButtonSelected.png");
+	auto button = Button::create("UI/ButtonNormal.png", "UI/ButtonSelected.png");
 	button->setTitleText(text);
-	button->setTitleFontName(Text::normalFont);
+	button->setTitleFontName(MyCreator::normalFont);
 	button->setTitleColor(Color3B::BLACK);
 	button->setTitleFontSize(30);
 	button->addClickEventListener(callback);
@@ -103,10 +104,10 @@ ui::Button* OptionScene::createButton(std::string text, Size size, std::function
 	return button;
 }
 
-ui::Layout * OptionScene::createLayout(std::string title, Size size)
+Layout * OptionScene::createLayout(std::string title, Size size)
 {
-	auto layout = ui::Layout::create();
-	auto titleLabel = Text::createLabel(title, 40, Color4B::BLACK);
+	auto layout = Layout::create();
+	auto titleLabel = MyCreator::createLabel(title, 40, Color4B::BLACK);
 	titleLabel->setPosition(size.width / 2, size.height - titleLabel->getContentSize().height / 2 - 20);
 	layout->addChild(titleLabel);
 	layout->setContentSize(size);
@@ -115,7 +116,7 @@ ui::Layout * OptionScene::createLayout(std::string title, Size size)
 
 const float goIntoOutTime = 0.5f;
 
-void OptionScene::goInto(ui::Widget* layout, ui::Widget* widget, ui::Widget* newWidget)
+void OptionScene::goInto(Widget* layout, Widget* widget, Widget* newWidget)
 {
 	layout->setEnabled(false);
 	newWidget->setEnabled(false);
@@ -152,7 +153,7 @@ void OptionScene::goInto(ui::Widget* layout, ui::Widget* widget, ui::Widget* new
 	}, goIntoOutTime, "goInto");
 }
 
-void OptionScene::goOut(ui::Widget* layout, ui::Widget* widget, ui::Widget* newWidget)
+void OptionScene::goOut(Widget* layout, Widget* widget, Widget* newWidget)
 {
 	layout->setEnabled(false);
 	newWidget->setEnabled(false);

@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
 #include "MainScene.h"
-#include "Text.h"
+#include "Lang.h"
 USING_NS_CC;
 
 static const cocos2d::Size designResolutionSize = cocos2d::Size(800, 600);
@@ -64,7 +64,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	searchPaths.push_back("res/");
 	FileUtils::getInstance()->setSearchPaths(searchPaths);
 	srand(unsigned(time(0)));
-	Text::init();
+	Lang::init();
 
 	auto scene = MainScene::create();
 

@@ -1,5 +1,6 @@
 #include "PvoGameScene.h"
-#include "Text.h"
+#include "Lang.h"
+#include "MyCreator.h"
 #include "Player.h"
 #include "ResultScene.h"
 #include "MainScene.h"
@@ -11,9 +12,9 @@ bool PvoGameScene::init()
 	timer = LayerColor::create();
 	if (!GameScene::init())
 		return false;
-	setNames(Player::getName(), Text::get("opponent"));
+	setNames(Player::getName(), Lang::get("opponent"));
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel = Text::createLabel(Text::get("connecting"), 25, Color4B(0, 0, 0, 255));
+	roomLabel = MyCreator::createLabel(Lang::get("connecting"), 25, Color4B(0, 0, 0, 255));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
 	this->addChild(roomLabel);
 
@@ -116,20 +117,20 @@ void PvoGameScene::changeTurn()
 
 void PvoGameScene::leftWins()
 {
-	auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
+	auto rs = ResultScene::create(Lang::get("playerWins"), Color4B(0, 255, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void PvoGameScene::rightWins()
 {
-	auto rs = ResultScene::create(Text::get("onlinePlayerWins"), Color4B(0, 0, 0, 255));
+	auto rs = ResultScene::create(Lang::get("onlinePlayerWins"), Color4B(0, 0, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	roomLabel->setString(Text::get("waiting"));
+	roomLabel->setString(Lang::get("waiting"));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
 }
 
@@ -150,7 +151,7 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 		controllable = true;
 	}
 	room = j.getInt("room");
-	roomLabel->setString(Text::get("room") + std::to_string(room));
+	roomLabel->setString(Lang::get("room") + std::to_string(room));
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
 
@@ -198,14 +199,14 @@ void PvoGameScene::onEndGame(SIOClient * client, const std::string & data)
 	Json j(data);
 	endGameReason = (EndGameReason)j.getInt("reason");
 	if (endGameReason == EndGameReason::opponentLeft) {
-		Director::getInstance()->replaceScene(ResultScene::create(Text::get("opponentLeft"), Color4B(0, 0, 0, 255)));
+		Director::getInstance()->replaceScene(ResultScene::create(Lang::get("opponentLeft"), Color4B(0, 0, 0, 255)));
 	}
 	else if (endGameReason == EndGameReason::timeOut) {
 		if (turn == left) {
-			Director::getInstance()->replaceScene(ResultScene::create(Text::get("playerTimeOut"), Color4B(0, 0, 0, 255)));
+			Director::getInstance()->replaceScene(ResultScene::create(Lang::get("playerTimeOut"), Color4B(0, 0, 0, 255)));
 		}
 		else {
-			Director::getInstance()->replaceScene(ResultScene::create(Text::get("opponentTimeOut"), Color4B(0, 0, 0, 255)));
+			Director::getInstance()->replaceScene(ResultScene::create(Lang::get("opponentTimeOut"), Color4B(0, 0, 0, 255)));
 		}
 	}
 }
@@ -213,7 +214,7 @@ void PvoGameScene::onEndGame(SIOClient * client, const std::string & data)
 void PvoGameScene::onDisconnected(SIOClient * client, const std::string & data)
 {
 	if (endGameReason == EndGameReason::unknown) {
-		Director::getInstance()->replaceScene(ResultScene::create(Text::get("unknownDisconnect"), Color4B(0, 0, 0, 255)));
+		Director::getInstance()->replaceScene(ResultScene::create(Lang::get("unknownDisconnect"), Color4B(0, 0, 0, 255)));
 	}
 	disconnected = true;
 }

@@ -40,13 +40,16 @@
     <ClCompile Include="..\Classes\Json.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Text.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Player.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\OptionScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Lang.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MyCreator.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -81,13 +84,16 @@
     <ClInclude Include="..\Classes\Json.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Text.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Player.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\OptionScene.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Lang.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MyCreator.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

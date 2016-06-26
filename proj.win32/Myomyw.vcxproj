@@ -148,14 +148,15 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\GameScene.cpp" />
     <ClCompile Include="..\Classes\Json.cpp" />
+    <ClCompile Include="..\Classes\Lang.cpp" />
     <ClCompile Include="..\Classes\MainScene.cpp" />
+    <ClCompile Include="..\Classes\MyCreator.cpp" />
     <ClCompile Include="..\Classes\OptionScene.cpp" />
     <ClCompile Include="..\Classes\Player.cpp" />
     <ClCompile Include="..\Classes\PvaGameScene.cpp" />
     <ClCompile Include="..\Classes\PvoGameScene.cpp" />
     <ClCompile Include="..\Classes\PvpGameScene.cpp" />
     <ClCompile Include="..\Classes\ResultScene.cpp" />
-    <ClCompile Include="..\Classes\Text.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,14 +164,15 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\GameDefinitions.h" />
     <ClInclude Include="..\Classes\GameScene.h" />
     <ClInclude Include="..\Classes\Json.h" />
+    <ClInclude Include="..\Classes\Lang.h" />
     <ClInclude Include="..\Classes\MainScene.h" />
+    <ClInclude Include="..\Classes\MyCreator.h" />
     <ClInclude Include="..\Classes\OptionScene.h" />
     <ClInclude Include="..\Classes\Player.h" />
     <ClInclude Include="..\Classes\PvaGameScene.h" />
     <ClInclude Include="..\Classes\PvoGameScene.h" />
     <ClInclude Include="..\Classes\PvpGameScene.h" />
     <ClInclude Include="..\Classes\ResultScene.h" />
-    <ClInclude Include="..\Classes\Text.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>

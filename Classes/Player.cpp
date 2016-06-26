@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "Text.h"
+#include "Lang.h"
 #include "network/HttpClient.h"
 using namespace cocos2d::network;
 
@@ -49,13 +49,13 @@ std::string Player::getName()
 {
 	if (logged) {
 		if (guest) {
-			return Text::get("guest");
+			return Lang::get("guest");
 		}
 		else {
 			return name;
 		}
 	}
 	else {
-		return Text::get("notLogged");
+		return Lang::get("notLogged");
 	}
 }

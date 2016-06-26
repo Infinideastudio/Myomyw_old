@@ -1,5 +1,6 @@
 #include "GameScene.h"
-#include "Text.h"
+#include "Lang.h"
+#include "MyCreator.h"
 #include "ResultScene.h"
 #include "MainScene.h"
 USING_NS_CC;
@@ -42,9 +43,9 @@ bool GameScene::init()
 	stencil->addChild(chessmanNode);
 	board->addChild(stencil, 1);
 	//--双方名称--//
-	leftNameLabel = Text::createLabel("", 26, Color4B(0, 0, 0, 255));
+	leftNameLabel = MyCreator::createLabel("", 26, Color4B(0, 0, 0, 255));
 	this->addChild(leftNameLabel);
-	rightNameLabel = Text::createLabel("", 26, Color4B(0, 0, 0, 255));
+	rightNameLabel = MyCreator::createLabel("", 26, Color4B(0, 0, 0, 255));
 	this->addChild(rightNameLabel);
 	//--设置回调--//
 	auto ejectorTouchListener = EventListenerTouchOneByOne::create();//<-这个只是添加到Layer
@@ -418,12 +419,12 @@ void GameScene::changeTurn(bool setFlag)
 
 void GameScene::leftWins()
 {
-	auto rs = ResultScene::create(Text::get("greenWins"), Color4B(0, 255, 0, 255));
+	auto rs = ResultScene::create(Lang::get("greenWins"), Color4B(0, 255, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void GameScene::rightWins()
 {
-	auto rs = ResultScene::create(Text::get("blueWins"), Color4B(0, 0, 255, 255));
+	auto rs = ResultScene::create(Lang::get("blueWins"), Color4B(0, 0, 255, 255));
 	Director::getInstance()->replaceScene(rs);
 }

@@ -1,11 +1,11 @@
 #include "PvpGameScene.h"
-#include "Text.h"
+#include "Lang.h"
 
 bool PvpGameScene::init()
 {
 	if (!GameScene::init())
 		return false;
-	setNames(Text::get("green"), Text::get("blue"));
+	setNames(Lang::get("green"), Lang::get("blue"));
 	setNextChessman(getRandomchessman());
 	controllable = true;
 	return true;

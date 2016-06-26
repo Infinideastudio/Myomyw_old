@@ -3,7 +3,8 @@
 #include "PvaGameScene.h"
 #include "PvoGameScene.h"
 #include "OptionScene.h"
-#include "Text.h"
+#include "Lang.h"
+#include "MyCreator.h"
 #include "Player.h"
 USING_NS_CC;
 
@@ -37,25 +38,25 @@ bool MainScene::init()
 	auto loginLayer = Layer::create();
 	scrollableLayer->addChild(loginLayer);
 	//--БъЬт--//
-	auto titleLabel = Text::createLabel(Text::get("loginTitle"), 40, Color4B::BLACK);
+	auto titleLabel = MyCreator::createLabel(Lang::get("loginTitle"), 40, Color4B::BLACK);
 	titleLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
 	loginLayer->addChild(titleLabel);
 
 	nameBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
 	nameBox->setFontColor(Color4B::BLACK);
 	nameBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 50));
-	nameBox->setPlaceHolder(Text::get("enterName").c_str());
+	nameBox->setPlaceHolder(Lang::get("enterName").c_str());
 	nameBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
 	loginLayer->addChild(nameBox);
 
 	addressBox = ui::EditBox::create(Size(400, 40), ui::Scale9Sprite::create(Rect(1.5, 1.5, 1, 1), "UI/EditBox.png"));
 	addressBox->setFontColor(Color4B::BLACK);
 	addressBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 50));
-	addressBox->setPlaceHolder(Text::get("enterAddress").c_str());
+	addressBox->setPlaceHolder(Lang::get("enterAddress").c_str());
 	addressBox->setPlaceholderFontColor(Color4B(100, 100, 100, 255));
 	loginLayer->addChild(addressBox);
 
-	auto loginLabel = Text::createLabel(Text::get("login"), 32, Color4B(30, 100, 30, 255));
+	auto loginLabel = MyCreator::createLabel(Lang::get("login"), 32, Color4B(30, 100, 30, 255));
 	auto loginItem = MenuItemLabel::create(loginLabel, [this](Ref* pSender) {
 		Player::login(nameBox->getText(), addressBox->getText(), CC_CALLBACK_0(MainScene::moveToMainLayer, this), [](std::string error) {
 			MessageBox(error.c_str(), "Myomyw");
@@ -63,7 +64,7 @@ bool MainScene::init()
 	});
 	loginItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 100);
 
-	auto guestLabel = Text::createLabel(Text::get("loginWithGuest"), 32, Color4B(30, 100, 30, 255));
+	auto guestLabel = MyCreator::createLabel(Lang::get("loginWithGuest"), 32, Color4B(30, 100, 30, 255));
 	auto guestItem = MenuItemLabel::create(guestLabel, [this](Ref* pSender) {
 		Player::loginWithGuest();
 		moveToMainLayer();
@@ -78,24 +79,24 @@ bool MainScene::init()
 	mainLayer->setPosition(Vec2(visibleSize.width, 0));
 	scrollableLayer->addChild(mainLayer);
 
-	auto pvpLabel = Text::createLabel(Text::get("pvp"), 32, Color4B(30, 100, 30, 255));
+	auto pvpLabel = MyCreator::createLabel(Lang::get("pvp"), 32, Color4B(30, 100, 30, 255));
 	auto pvpItem = MenuItemLabel::create(pvpLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvpGameScene::create()); });
 	pvpItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 + 100);
 
-	auto pvaLabel = Text::createLabel(Text::get("pva"), 32, Color4B(30, 100, 30, 255));
+	auto pvaLabel = MyCreator::createLabel(Lang::get("pva"), 32, Color4B(30, 100, 30, 255));
 	auto pvaItem = MenuItemLabel::create(pvaLabel, [](Ref* pSender)
 	{Director::getInstance()->replaceScene(PvaGameScene::create());  });
 	pvaItem->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 
-	auto pvoLabel = Text::createLabel(Text::get("pvo"), 32, Color4B(30, 100, 30, 255));
+	auto pvoLabel = MyCreator::createLabel(Lang::get("pvo"), 32, Color4B(30, 100, 30, 255));
 	pvoItem = MenuItemLabel::create(pvoLabel, [](Ref* pSender) {
 		Director::getInstance()->replaceScene(PvoGameScene::create());
 	});
 	pvoItem->setPosition(visibleSize.width / 2, visibleSize.height / 2 - 100);
 	pvoItem->setEnabled(Player::isLogged() && !Player::isGuest());
 
-	auto logoutLabel = Text::createLabel(Text::get("logout"), 25, Color4B(255, 0, 0, 255));
+	auto logoutLabel = MyCreator::createLabel(Lang::get("logout"), 25, Color4B(255, 0, 0, 255));
 	auto logoutItem = MenuItemLabel::create(logoutLabel, [this](Ref* pSender) {
 		Player::logout();
 		moveToLoginLayer();
@@ -107,13 +108,13 @@ bool MainScene::init()
 	mainMenu->setEnabled(false);
 	mainLayer->addChild(mainMenu);
 
-	playerLabel = Text::createLabel("", 25, Color4B(0, 0, 0, 255));
+	playerLabel = MyCreator::createLabel("", 25, Color4B(0, 0, 0, 255));
 	mainLayer->addChild(playerLabel);
 	if (Player::isLogged()) {
 		updatePlayerLabel();
 	}
 
-	auto versionLabel = Text::createLabel("Alpha 0.2", 25, Color4B(0, 0, 0, 255));
+	auto versionLabel = MyCreator::createLabel("Alpha 0.2", 25, Color4B(0, 0, 0, 255));
 	versionLabel->setPosition(visibleSize.width - versionLabel->getContentSize().width / 2, versionLabel->getContentSize().height / 2);
 	this->addChild(versionLabel);
 	return true;
@@ -148,7 +149,7 @@ void MainScene::updatePlayerLabel()
 	auto str = Player::getName();
 	if (!Player::isGuest()) {
 		str.append("  ");
-		str.append(Text::get("serverName"));
+		str.append(Lang::get("serverName"));
 		str.append(Player::getServerName());
 	}
 	playerLabel->setString(str);
