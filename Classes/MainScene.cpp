@@ -119,10 +119,12 @@ bool MainScene::init()
 	return true;
 }
 
+const float layoutMoveTime = 1.0f;
+
 void MainScene::moveToMainLayer()
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	auto moveAction = MoveTo::create(1, Vec2(-visibleSize.width, 0));
+	auto moveAction = MoveTo::create(layoutMoveTime, Vec2(-visibleSize.width, 0));
 	auto easeAction = EaseExponentialInOut::create(moveAction);
 	scrollableLayer->runAction(easeAction);
 	pvoItem->setEnabled(!Player::isGuest());
@@ -133,7 +135,7 @@ void MainScene::moveToLoginLayer()
 {
 	loginMenu->setEnabled(true);
 	mainMenu->setEnabled(false);
-	auto moveAction = MoveTo::create(1, Vec2::ZERO);
+	auto moveAction = MoveTo::create(layoutMoveTime, Vec2::ZERO);
 	auto easeAction = EaseExponentialInOut::create(moveAction);
 	scrollableLayer->runAction(easeAction);
 }

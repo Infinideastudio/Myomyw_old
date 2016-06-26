@@ -73,9 +73,9 @@ void GameScene::setNextChessman(Chessman chessman)
 {
 	nextChessman = chessman;
 	auto old = this->getChildByName("next");
-	auto moveAction = MoveBy::create(0.5, Vec2(0, -20));
+	auto moveAction = MoveBy::create(nextChessmanChangeTime, Vec2(0, -20));
 	if (old) {
-		auto fadeOutAction = FadeOut::create(0.5);
+		auto fadeOutAction = FadeOut::create(nextChessmanChangeTime);
 		auto callAction = CallFunc::create([this]() {this->removeChildByName("next"); });
 		auto sequenceAction = Sequence::create(fadeOutAction, callAction, NULL);
 		old->runAction(moveAction);
@@ -87,7 +87,7 @@ void GameScene::setNextChessman(Chessman chessman)
 	nextChessmanSprite->setScale(0.8f);
 	nextChessmanSprite->setPosition((Vec2)this->getContentSize() - Vec2(50, 70));
 	nextChessmanSprite->setName("next");
-	auto fadeInAction = FadeIn::create(0.5);
+	auto fadeInAction = FadeIn::create(nextChessmanChangeTime);
 	nextChessmanSprite->runAction(moveAction->clone());
 	nextChessmanSprite->runAction(fadeInAction);
 	this->addChild(nextChessmanSprite);
@@ -290,10 +290,10 @@ void GameScene::flip()
 	}
 	std::swap(lCol, rCol);
 
-	auto scaleAction1 = ScaleTo::create(0.5, 0, 1);
+	auto scaleAction1 = ScaleTo::create(boardFilpTime / 2, 0, 1);
 	auto callAction1 = CallFunc::create(CC_CALLBACK_0(GameScene::buildChessboard, this));
 	auto callAction2 = CallFunc::create(CC_CALLBACK_0(GameScene::setTurnFlag, this));
-	auto scaleAction2 = ScaleTo::create(0.5, 1);
+	auto scaleAction2 = ScaleTo::create(boardFilpTime / 2, 1);
 	auto sequenceAction = Sequence::create(scaleAction1, callAction1, callAction2, scaleAction2, NULL);
 	board->runAction(sequenceAction);
 }

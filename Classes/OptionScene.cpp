@@ -113,6 +113,8 @@ ui::Layout * OptionScene::createLayout(std::string title, Size size)
 	return layout;
 }
 
+const float goIntoOutTime = 0.5f;
+
 void OptionScene::goInto(ui::Widget* layout, ui::Widget* widget, ui::Widget* newWidget)
 {
 	layout->setEnabled(false);
@@ -122,7 +124,7 @@ void OptionScene::goInto(ui::Widget* layout, ui::Widget* widget, ui::Widget* new
 	auto buttonSize = widget->getContentSize();
 	layout->setAnchorPoint(Vec2(buttonCenter.x / layoutSize.width, buttonCenter.y / layoutSize.height));
 	layout->setPosition(buttonCenter);
-	auto moveAction = MoveTo::create(0.5f, this->getContentSize() / 2);
+	auto moveAction = MoveTo::create(goIntoOutTime, this->getContentSize() / 2);
 	layout->runAction(moveAction);
 	int sacle;
 	if (buttonSize.width > buttonSize.height) {
@@ -131,23 +133,23 @@ void OptionScene::goInto(ui::Widget* layout, ui::Widget* widget, ui::Widget* new
 	else {
 		sacle = this->getContentSize().width / buttonSize.width;
 	}
-	auto scaleAction = ScaleTo::create(0.5f, sacle);
+	auto scaleAction = ScaleTo::create(goIntoOutTime, sacle);
 	layout->runAction(scaleAction);
-	auto fadeOutAaction = FadeOut::create(0.5f);
+	auto fadeOutAaction = FadeOut::create(goIntoOutTime);
 	widget->runAction(fadeOutAaction);
 
 	newWidget->setAnchorPoint(Vec2(0.5f, 0.5f));
 	newWidget->setPosition(buttonCenter);
 	this->addChild(newWidget);
 	newWidget->setScale(1 / sacle);
-	auto newScaleAction = ScaleTo::create(0.5f, 1.0f);
+	auto newScaleAction = ScaleTo::create(goIntoOutTime, 1.0f);
 	newWidget->runAction(newScaleAction);
 	newWidget->runAction(moveAction->clone());
-	auto fadeInAaction = FadeIn::create(0.5f);
+	auto fadeInAaction = FadeIn::create(goIntoOutTime);
 	newWidget->runAction(fadeInAaction);
 	scheduleOnce([newWidget](float) {
 		newWidget->setEnabled(true);
-	}, 0.5f, "goInto");
+	}, goIntoOutTime, "goInto");
 }
 
 void OptionScene::goOut(ui::Widget* layout, ui::Widget* widget, ui::Widget* newWidget)
@@ -159,11 +161,11 @@ void OptionScene::goOut(ui::Widget* layout, ui::Widget* widget, ui::Widget* newW
 	auto buttonSize = widget->getContentSize();
 	layout->setAnchorPoint(Vec2(buttonCenter.x / layoutSize.width, buttonCenter.y / layoutSize.height));
 	layout->setPosition(buttonCenter);
-	auto moveAction = MoveTo::create(0.5f, buttonCenter);
+	auto moveAction = MoveTo::create(goIntoOutTime, buttonCenter);
 	layout->runAction(moveAction);
-	auto scaleAction = ScaleTo::create(0.5f, 1.0f);
+	auto scaleAction = ScaleTo::create(goIntoOutTime, 1.0f);
 	layout->runAction(scaleAction);
-	auto fadeInAaction = FadeIn::create(0.5f);
+	auto fadeInAaction = FadeIn::create(goIntoOutTime);
 	widget->runAction(fadeInAaction);
 
 	int sacle;
@@ -173,13 +175,13 @@ void OptionScene::goOut(ui::Widget* layout, ui::Widget* widget, ui::Widget* newW
 	else {
 		sacle = this->getContentSize().width / buttonSize.width;
 	}
-	auto newScaleAction = ScaleTo::create(0.5f, 1 / sacle);
+	auto newScaleAction = ScaleTo::create(goIntoOutTime, 1 / sacle);
 	newWidget->runAction(newScaleAction);
 	newWidget->runAction(moveAction->clone());
-	auto fadeOutAaction = FadeOut::create(0.5f);
+	auto fadeOutAaction = FadeOut::create(goIntoOutTime);
 	newWidget->runAction(fadeOutAaction);
 	scheduleOnce([this, newWidget, layout](float) {
 		this->removeChild(newWidget);
 		layout->setEnabled(true);
-	}, 0.5f, "goOut");
+	}, goIntoOutTime, "goOut");
 }

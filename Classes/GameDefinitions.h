@@ -7,6 +7,8 @@ const float movingTime = 0.3f;//移动用时
 const int maxMovementTimes = 5;//最大移动数量
 const int timeLimit = 20;//超时时间
 const float boardScaleTime = 0.2f;//缩放动画时间
+const float boardFilpTime = 0.8f;//翻转动画时间
+const float nextChessmanChangeTime = 0.5f;//切换下一个棋子提示的时间
 
 enum Side { left, right };
 enum class Chessman { unknown, common, key, addCol, delCol, flip };
