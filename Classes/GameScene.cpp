@@ -26,7 +26,9 @@ bool GameScene::init()
 	this->addChild(menu);
 	//--棋盘层--//
 	board = Layer::create();
-	board->setPosition((visibleSize.width - drawLength) / 2, (visibleSize.height - drawLength) / 2);
+	board->ignoreAnchorPointForPosition(false);
+	board->setContentSize(Size(drawLength, drawLength));
+	board->setPosition(visibleSize / 2);
 	this->addChild(board);
 	//--网格绘制节点--//
 	gridNode = Node::create();
@@ -275,7 +277,13 @@ void GameScene::flip()
 		}
 	}
 	std::swap(lCol, rCol);
-	buildChessboard();
+
+	auto scaleAction1 = ScaleTo::create(0.5, 0, 1);
+	auto callAction1 = CallFunc::create(CC_CALLBACK_0(GameScene::buildChessboard, this));
+	auto callAction2 = CallFunc::create(CC_CALLBACK_0(GameScene::setTurnFlag, this));
+	auto scaleAction2 = ScaleTo::create(0.5, 1);
+	auto sequenceAction = Sequence::create(scaleAction1, callAction1, callAction2, scaleAction2, NULL);
+	board->runAction(sequenceAction);
 }
 
 Chessman GameScene::getRandomchessman()
@@ -324,6 +332,9 @@ void GameScene::endMoving()
 		}
 		chessmen[movingCol][0] = movingNewChessman;
 		switch (lastChessman) {
+		case Chessman::common:
+			updateChessboard();
+			break;
 		case Chessman::key:
 			rightWins();
 			break;
@@ -345,6 +356,9 @@ void GameScene::endMoving()
 		}
 		chessmen[0][movingCol] = movingNewChessman;
 		switch (lastChessman) {
+		case Chessman::common:
+			updateChessboard();
+			break;
 		case Chessman::key:
 			leftWins();
 			break;
@@ -359,14 +373,14 @@ void GameScene::endMoving()
 			break;
 		}
 	}
-	updateChessboard();
+
 	if (controllable) {
 		if (touching && totalMovements < maxMovementTimes) {
 			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol), movingCooling, "cool");
 			state = ActionState::cooling;
 		}
 		else {
-			changeTurn();
+			changeTurn(lastChessman != Chessman::flip);
 		}
 	}
 	else {
@@ -374,18 +388,20 @@ void GameScene::endMoving()
 	}
 }
 
-void GameScene::setTurn(Side turn)
+void GameScene::setTurn(Side turn, bool setFlag)
 {
 	this->turn = turn;
-	setTurnFlag();
+	if (setFlag) {
+		setTurnFlag();
+	}
 	totalMovements = 0;
 	touching = false;
 	state = ActionState::nothing;
 }
 
-void GameScene::changeTurn()
+void GameScene::changeTurn(bool setFlag)
 {
-	setTurn(turn == left ? right : left);
+	setTurn(turn == left ? right : left, setFlag);
 }
 
 void GameScene::leftWins()
