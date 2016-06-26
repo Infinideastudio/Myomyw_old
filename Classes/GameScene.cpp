@@ -72,11 +72,24 @@ void GameScene::setNames(std::string left, std::string right)
 void GameScene::setNextChessman(Chessman chessman)
 {
 	nextChessman = chessman;
-	this->removeChildByName("next");
+	auto old = this->getChildByName("next");
+	auto moveAction = MoveBy::create(0.5, Vec2(0, -20));
+	if (old) {
+		auto fadeOutAction = FadeOut::create(0.5);
+		auto callAction = CallFunc::create([this]() {this->removeChildByName("next"); });
+		auto sequenceAction = Sequence::create(fadeOutAction, callAction, NULL);
+		old->runAction(moveAction);
+		old->runAction(sequenceAction);
+	}
+
 	auto nextChessmanSprite = createSpriteByChessman(nextChessman);
+	nextChessmanSprite->setOpacity(0);
 	nextChessmanSprite->setScale(0.8f);
-	nextChessmanSprite->setPosition((Vec2)this->getContentSize() - Vec2(50, 80));
+	nextChessmanSprite->setPosition((Vec2)this->getContentSize() - Vec2(50, 70));
 	nextChessmanSprite->setName("next");
+	auto fadeInAction = FadeIn::create(0.5);
+	nextChessmanSprite->runAction(moveAction->clone());
+	nextChessmanSprite->runAction(fadeInAction);
 	this->addChild(nextChessmanSprite);
 }
 
@@ -207,7 +220,6 @@ Sprite* GameScene::createSpriteByChessman(Chessman type)
 	chessman->setScaleY(halfDiagonal / chessman->getContentSize().height);
 	return chessman;
 }
-
 
 bool GameScene::ejectorTouchBeganCallback(Touch * touch, Event * event)
 {
