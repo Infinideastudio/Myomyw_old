@@ -57,6 +57,7 @@ bool GameScene::init()
 
 	buildChessboard();
 	setTurn(left);
+	setTurnFlag();
 
 	return true;
 }
@@ -249,6 +250,7 @@ void GameScene::ejectorTouchEndedCallback(Touch * touch, Event * event)
 	if (controllable && state == ActionState::cooling) {
 		unschedule("cool");
 		changeTurn();
+		setTurnFlag();
 	}
 }
 
@@ -393,7 +395,10 @@ void GameScene::endMoving()
 			state = ActionState::cooling;
 		}
 		else {
-			changeTurn(lastChessman != Chessman::flip);
+			changeTurn();
+			if (lastChessman != Chessman::flip) {
+				setTurnFlag();
+			}
 		}
 	}
 	else {
@@ -401,20 +406,17 @@ void GameScene::endMoving()
 	}
 }
 
-void GameScene::setTurn(Side turn, bool setFlag)
+void GameScene::setTurn(Side turn)
 {
 	this->turn = turn;
-	if (setFlag) {
-		setTurnFlag();
-	}
 	totalMovements = 0;
 	touching = false;
 	state = ActionState::nothing;
 }
 
-void GameScene::changeTurn(bool setFlag)
+void GameScene::changeTurn()
 {
-	setTurn(turn == left ? right : left, setFlag);
+	setTurn(turn == left ? right : left);
 }
 
 void GameScene::leftWins()

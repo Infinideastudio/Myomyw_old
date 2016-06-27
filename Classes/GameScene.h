@@ -40,8 +40,8 @@ protected:
 	Chessman getRandomchessman();
 	virtual void beginMoving(int col);
 	virtual void endMoving();
-	virtual void setTurn(Side turn, bool setFlag = true);
-	virtual void changeTurn(bool setFlag = true);
+	virtual void setTurn(Side turn);
+	virtual void changeTurn();
 	virtual void leftWins();
 	virtual void rightWins();
 private:
