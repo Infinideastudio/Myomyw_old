@@ -249,8 +249,7 @@ void GameScene::ejectorTouchEndedCallback(Touch * touch, Event * event)
 	//如果正在冷却,那么立刻停止
 	if (controllable && state == ActionState::cooling) {
 		unschedule("cool");
-		changeTurn();
-		setTurnFlag();
+		changeTurnAndSetTurnFlag();
 	}
 }
 
@@ -417,6 +416,12 @@ void GameScene::setTurn(Side turn)
 void GameScene::changeTurn()
 {
 	setTurn(turn == left ? right : left);
+}
+
+void GameScene::changeTurnAndSetTurnFlag()
+{
+	changeTurn();
+	setTurnFlag();
 }
 
 void GameScene::leftWins()

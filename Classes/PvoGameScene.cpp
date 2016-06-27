@@ -94,7 +94,7 @@ void PvoGameScene::endMoving()
 {
 	GameScene::endMoving();
 	if (shouldEndTurn) {
-		changeTurn();
+		changeTurnAndSetTurnFlag();
 		shouldEndTurn = false;
 	}
 }
@@ -189,7 +189,7 @@ void PvoGameScene::onChangeTurn(SIOClient * client, const std::string & data)
 			shouldEndTurn = true;
 		}
 		else {
-			changeTurn();
+			changeTurnAndSetTurnFlag();
 		}
 	}
 }

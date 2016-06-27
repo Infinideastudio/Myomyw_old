@@ -29,7 +29,7 @@ void PvaGameScene::endMoving()
 			scheduleOnce([this](float) {beginMoving(movingCol); }, movingCooling, "cool");
 		}
 		else {
-			changeTurn();
+			changeTurnAndSetTurnFlag();
 		}
 	}
 }

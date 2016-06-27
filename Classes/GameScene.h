@@ -42,6 +42,7 @@ protected:
 	virtual void endMoving();
 	virtual void setTurn(Side turn);
 	virtual void changeTurn();
+	void changeTurnAndSetTurnFlag();
 	virtual void leftWins();
 	virtual void rightWins();
 private:
