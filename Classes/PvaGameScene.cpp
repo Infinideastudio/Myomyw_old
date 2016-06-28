@@ -25,6 +25,9 @@ void PvaGameScene::endMoving()
 	GameScene::endMoving();
 	if (originalTurn == right) {
 		if (AIMovementTimes > 0) {
+			if (chessmen[lCol - 1][movingCol] == Chessman::flip) {
+				AIMovementTimes = 1;
+			}
 			AIMovementTimes--;
 			scheduleOnce([this](float) {beginMoving(movingCol); }, movingCooling, "cool");
 		}
