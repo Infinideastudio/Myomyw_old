@@ -115,7 +115,6 @@ Room.prototype.createAndTellNextChessman = function () {
     this.nextChessman = this.getRandomChessman();
     this.leftPlayer.emit('nextChessman', { chessman: this.nextChessman });
     this.rightPlayer.emit('nextChessman', { chessman: this.nextChessman });
-    console.log('told');
 }
 
 Room.prototype.getRandomChessman = function () {
@@ -199,6 +198,9 @@ Room.prototype.move = function (col, chessman) {
                 this.flip();
                 break;
         }
+    }
+    if (lastChessman == Chessman.flip) {
+        this.totalMovementTimes = config.maxMovementTimes;
     }
     return false;
 }

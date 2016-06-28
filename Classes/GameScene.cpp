@@ -225,7 +225,7 @@ Sprite* GameScene::createSpriteByChessman(Chessman type)
 
 bool GameScene::ejectorTouchBeganCallback(Touch * touch, Event * event)
 {
-	if (controllable) {
+	if (controllable && state != ActionState::moving) {
 		//遍历当前边的发射器
 		for (int i = 0; i < (turn == left ? lCol : rCol); i++) {
 			//判断鼠标是否处于发射器内(45°倾斜的正方形)
@@ -387,22 +387,24 @@ void GameScene::endMoving()
 			break;
 		}
 	}
-
-	if (controllable) {
-		if (touching && totalMovements < maxMovementTimes) {
-			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol), movingCooling, "cool");
-			state = ActionState::cooling;
-		}
-		else {
-			changeTurn();
-			if (lastChessman != Chessman::flip) {
-				setTurnFlag();
-			}
-		}
+	if (lastChessman == Chessman::flip && controllable) {
+		changeTurn();
 	}
 	else {
-		state = ActionState::nothing;
+		if (controllable) {
+			if (touching && totalMovements < maxMovementTimes) {
+				scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol), movingCooling, "cool");
+				state = ActionState::cooling;
+			}
+			else {
+				changeTurnAndSetTurnFlag();
+			}
+		}
+		else {
+			state = ActionState::nothing;
+		}
 	}
+
 }
 
 void GameScene::setTurn(Side turn)
