@@ -8,12 +8,6 @@ public:
 	virtual bool init();
 	CREATE_FUNC(GameScene);
 protected:
-	int lCol = defaultLCol, rCol = defaultRCol;//棋盘大小
-	Side turn = left;//当前回合
-	Chessman chessmen[maxLCol][maxRCol];//棋盘
-	bool moving = false;//是否移动中
-	int movingCol;//移动中的列
-	Chessman movingNewChessman;//移出来的新棋子
 	float drawLength;
 	float halfDiagonal;
 	float diagonal;
@@ -22,24 +16,46 @@ protected:
 	Vec2 rightVertex;
 	Vec2 bottomVertex;
 	Layer* board;
-	Node* ejectorNode;//放发射器的节点
-	Node* chessmanNode;//放棋子的节点(也就是裁切底板)
-	DrawNode* gridDrawNode;//网格绘制节点
+	Sprite* leftEjectors[maxLCol], *rightEjectors[maxRCol];
+	DrawNode* border;
+	Node* gridNode;//网格节点
+	Node* chessmanNode;//棋子节点(也就是裁切底板)
 	Label* leftNameLabel;
 	Label* rightNameLabel;
 
+	int lCol = defaultLCol, rCol = defaultRCol;//棋盘大小
+	Side turn = left;//当前回合
+	Chessman chessmen[maxLCol][maxRCol];//棋盘
+	ActionState state;
+	int movingCol;//移动中的列
+	bool controllable = false;
+
 	void setNames(std::string left, std::string right);
-	bool setBoardSize(int lCol, int rCol);
+	Chessman getNextChessman() { return nextChessman; };
+	void setNextChessman(Chessman chessman);
 	virtual void setTurnFlag();
 	virtual void buildChessboard();
 	virtual void updateChessboard();
-	Sprite* createSpriteByChessman(Chessman type);
-	virtual void beginMoving(int col, Chessman chessman);
+	virtual Sprite* createSpriteByChessman(Chessman type);
+	Chessman getRandomchessman();
+	virtual void beginMoving(int col);
 	virtual void endMoving();
+	virtual void setTurn(Side turn);
 	virtual void changeTurn();
+	void changeTurnAndSetTurnFlag();
 	virtual void leftWins();
 	virtual void rightWins();
 private:
 	ClippingNode* stencil;//裁切节点
 	DrawNode* stencilDrawNode;//裁切模板图形
+
+	bool touching = false;
+	Chessman movingNewChessman;//移出来的新棋子
+	Chessman nextChessman;//下一个棋子
+	int totalMovements;
+
+	bool ejectorTouchBeganCallback(Touch* touch, Event* event);
+	void ejectorTouchEndedCallback(Touch* touch, Event* event);
+	bool setBoardSize(int lCol, int rCol);
+	void flip();
 };

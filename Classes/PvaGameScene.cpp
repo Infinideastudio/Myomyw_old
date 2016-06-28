@@ -1,58 +1,61 @@
 #include "PvaGameScene.h"
-#include "Text.h"
+#include "Lang.h"
+#include "Player.h"
 #include "ResultScene.h"
 
 bool PvaGameScene::init()
 {
-	if (!ControllableGameScene::init())
+	if (!GameScene::init())
 		return false;
-	setNames(Text::get("me"), Text::get("machine"));
+	setNames(Player::getName(), Lang::get("machine"));
+	setNextChessman(getRandomchessman());
+	controllable = true;
 	return true;
 }
 
-void PvaGameScene::activateEjector(int col)
+void PvaGameScene::beginMoving(int col)
 {
-	if (turn == left) {
-		ControllableGameScene::activateEjector(col);
-	}
+	GameScene::beginMoving(col);
+	setNextChessman(getRandomchessman());
 }
 
 void PvaGameScene::endMoving()
 {
-	//下面的代码貌似能简化对吧，但别简化。。。
-	if (turn == right) {
-		ControllableGameScene::endMoving();
+	Side originalTurn = turn;//去除这次endMoving才变成right的情况
+	GameScene::endMoving();
+	if (originalTurn == right) {
 		if (AIMovementTimes > 0) {
 			AIMovementTimes--;
-			scheduleOnce(CC_CALLBACK_0(PvaGameScene::beginMoving, this, AIMovingCol, getNextChessman()), movingCooling, "cooling");
+			scheduleOnce([this](float) {beginMoving(movingCol); }, movingCooling, "cool");
 		}
 		else {
-			changeTurn();
+			changeTurnAndSetTurnFlag();
 		}
 	}
-	else {
-		ControllableGameScene::endMoving();
-	}
-
 }
 
 void PvaGameScene::changeTurn()
 {
-	ControllableGameScene::changeTurn();
+	GameScene::changeTurn();
 	if (turn == right) {
-		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "changing");
+		controllable = false;
+		//切换回合后冷却一下再让AI下(否则看起来太突然)
+		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "changeCool");
+	}
+	else {
+		controllable = true;
 	}
 }
 
 void PvaGameScene::leftWins()
 {
-	auto rs = ResultScene::create(Text::get("playerWins"), Color4B(0, 255, 0, 255));
+	auto rs = ResultScene::create(Lang::get("playerWins"), Color4B(0, 255, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
 void PvaGameScene::rightWins()
 {
-	auto rs = ResultScene::create(Text::get("aiWins"), Color4B(0, 0, 0, 255));
+	auto rs = ResultScene::create(Lang::get("aiWins"), Color4B(0, 0, 0, 255));
 	Director::getInstance()->replaceScene(rs);
 }
 
@@ -88,19 +91,19 @@ void PvaGameScene::AIMove()
 			bestCol = i;
 		}
 	}
-	AIMovingCol = bestCol;
+	movingCol = bestCol;
 	//移动次数根据权重而变
 	int times = round(5 * maxWeighting) + rand() % 3;
 	//确定实际移动次数
 	if (times < 1) {
 		AIMovementTimes = 1;
 	}
-	else if (times>maxMovementTimes) {
+	else if (times > maxMovementTimes) {
 		AIMovementTimes = maxMovementTimes;
 	}
 	else {
 		AIMovementTimes = times;
 	}
-	beginMoving(AIMovingCol, getNextChessman());
+	beginMoving(movingCol);
 	AIMovementTimes--;
 }

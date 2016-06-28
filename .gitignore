@@ -4,6 +4,7 @@ Thumbs.db
 # Ignore files build by Visual Studio
 *.obj
 *.exe
+*.dll
 *.pdb
 *.aps
 *.vcproj.*.user
@@ -35,6 +36,7 @@ _ReSharper*/
 ipch/
 *.opensdf
 *.opendb
+*.db
 SubmissionInfo
 Generated Files
 AppPackages
@@ -156,3 +158,6 @@ cocos2d/
 # node.js
 node_modules/
 .ntvs_analysis.dat
+
+# Do not ignore Win10 Assets
+!/proj.win10/App/Assets/

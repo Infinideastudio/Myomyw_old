@@ -1,16 +1,15 @@
 #pragma once
 #include "cocos2d.h"
-#include "ControllableGameScene.h"
+#include "GameScene.h"
 
-class PvaGameScene :public ControllableGameScene
+class PvaGameScene :public GameScene
 {
 public:
 	virtual bool init();
 	CREATE_FUNC(PvaGameScene);
 private:
 	int AIMovementTimes;
-	int AIMovingCol;
-	void activateEjector(int col);
+	void beginMoving(int col);
 	void endMoving();
 	void changeTurn();
 	void leftWins();

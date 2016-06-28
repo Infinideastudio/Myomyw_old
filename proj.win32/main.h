@@ -8,6 +8,15 @@
 #include <tchar.h>
 
 // C RunTime Header Files
-#include "CCStdC.h"
+#include "platform/CCPlatformMacros.h"
+#include <float.h>
+#include <math.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <Windows.h>
+#include <WinSock2.h>
 
 #endif    // __MAIN_H__

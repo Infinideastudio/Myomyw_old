@@ -1,5 +1,5 @@
 #pragma once
-#include "ControllableGameScene.h"
+#include "GameScene.h"
 #include "cocos2d.h"
 #include "network\SocketIO.h"
 #include "Json.h"
@@ -7,23 +7,23 @@
 USING_NS_CC;
 using namespace cocos2d::network;
 
-class PvoGameScene :public ControllableGameScene, public SocketIO::SIODelegate
+class PvoGameScene :public GameScene, public SocketIO::SIODelegate
 {
 public:
-	virtual bool init(std::string address);
-	static PvoGameScene* create(std::string address);
+	virtual bool init();
+	CREATE_FUNC(PvoGameScene);
 	~PvoGameScene();
 private:
 	Label* roomLabel;
 	ClippingNode* timerStencil;
 	DrawNode* timerStencilDrawNode;
 	LayerColor* timer;
+	bool firstMessage = true;
+	bool firstMove = true;
 
 	SIOClient* client;
 	bool disconnected = false;
-	bool shouldChangeTurn = false;
-	bool started = false;
-	Chessman nextChessman;//服务器提供的下一个新球
+	bool shouldEndTurn = false;
 	int room;
 	EndGameReason endGameReason;
 	float time = timeLimit;
@@ -32,11 +32,9 @@ private:
 	void stopTimer();
 	void setTurnFlag();
 	void buildChessboard();
-	void activateEjector(int col);
-	void beginMoving(int col, Chessman chessman);
+	void beginMoving(int col);
 	void endMoving();
 	void changeTurn();
-	Chessman getNextChessman();
 	void leftWins();
 	void rightWins();
 
@@ -44,8 +42,8 @@ private:
 	void onError(SIOClient* client, const std::string &data);
 	void onClose(SIOClient* client) {};
 	void onStart(SIOClient* client, const std::string &data);
-	void onTellNewChessman(SIOClient* client, const std::string &data);
-	void onBeginMoving(SIOClient* client, const std::string &data);
+	void onNextChessman(SIOClient* client, const std::string &data);
+	void onMove(SIOClient* client, const std::string &data);
 	void onChangeTurn(SIOClient* client, const std::string &data);
 	void onEndGame(SIOClient* client, const std::string &data);
 	void onDisconnected(SIOClient* client, const std::string &data);
