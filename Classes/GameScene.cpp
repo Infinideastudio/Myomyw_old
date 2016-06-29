@@ -284,9 +284,10 @@ bool GameScene::setBoardSize(int lCol, int rCol)
 
 void GameScene::flip()
 {
-	for (int i = 0; i < lCol; i++)
+	Chessman tempChessman[maxLCol][maxRCol];
+	for (int i = 0; i < maxLCol; i++)
 	{
-		for (int j = i + 1; j < rCol; j++)
+		for (int j = i + 1; j < maxRCol; j++)
 		{
 			std::swap(chessmen[i][j], chessmen[j][i]);
 		}
@@ -331,7 +332,7 @@ void GameScene::beginMoving(int col)
 		for (int i = 0; i < (turn == left ? rCol : lCol); i++) {
 			chessmanNode->getChildByTag(turn == left ? movingCol*rCol + i : i*rCol + movingCol)->runAction(movingAction->clone());
 		}
-		newChessman->runAction(movingAction->clone());
+		newChessman->runAction(movingAction);
 		scheduleOnce(CC_CALLBACK_0(GameScene::endMoving, this), movingTime, "move");
 		totalMovements++;
 	}
@@ -339,7 +340,6 @@ void GameScene::beginMoving(int col)
 
 void GameScene::endMoving()
 {
-	Chessman lastChessman;//暂存最底下的棋子
 	if (turn == left) {
 		lastChessman = chessmen[movingCol][rCol - 1];
 		for (int i = rCol - 1; i > 0; i--) {

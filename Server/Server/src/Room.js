@@ -206,8 +206,8 @@ Room.prototype.move = function (col, chessman) {
 }
 
 Room.prototype.flip = function () {
-    for (var i = 0; i < this.lCol; i++) {
-        for (var j = i + 1; j < this.rCol; j++) {
+    for (var i = 0; i < config.maxLCol; i++) {
+        for (var j = i + 1; j < config.maxRCol; j++) {
             this.chessmen[i][j] ^= this.chessmen[j][i];
             this.chessmen[j][i] ^= this.chessmen[i][j];
             this.chessmen[i][j] ^= this.chessmen[j][i];
