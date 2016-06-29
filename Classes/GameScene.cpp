@@ -256,35 +256,36 @@ void GameScene::ejectorTouchEndedCallback(Touch * touch, Event * event)
 
 bool GameScene::setBoardSize(int lCol, int rCol)
 {
-	if (lCol > maxLCol || lCol<minLCol || rCol>maxRCol || rCol < minRCol)
-		return false;
-	//如果棋盘变大，把多出来的那部分清空
-	if (this->lCol < lCol) {
-		for (int i = this->lCol; i < lCol; i++) {
-			for (int j = 0; j < rCol; j++) {
-				chessmen[i][j] = Chessman::common;
+	if (lCol <= maxLCol && lCol >= minLCol && rCol <= maxRCol && rCol >= minRCol)
+	{
+		//如果棋盘变大，把多出来的那部分清空
+		if (this->lCol < lCol) {
+			for (int i = this->lCol; i < lCol; i++) {
+				for (int j = 0; j < rCol; j++) {
+					chessmen[i][j] = Chessman::common;
+				}
 			}
 		}
-	}
-	if (this->rCol < rCol) {
-		for (int i = 0; i < lCol; i++) {
-			for (int j = this->rCol; j < rCol; j++) {
-				chessmen[i][j] = Chessman::common;
+		if (this->rCol < rCol) {
+			for (int i = 0; i < lCol; i++) {
+				for (int j = this->rCol; j < rCol; j++) {
+					chessmen[i][j] = Chessman::common;
+				}
 			}
 		}
+		board->setScale((float)(lCol + rCol) / (this->lCol + this->rCol));
+		auto scaleAction = ScaleTo::create(boardScaleTime, 1);
+		board->runAction(scaleAction);
+		this->lCol = lCol;
+		this->rCol = rCol;
 	}
-	board->setScale((float)(lCol + rCol) / (this->lCol + this->rCol));
-	auto scaleAction = ScaleTo::create(boardScaleTime, 1);
-	board->runAction(scaleAction);
-	this->lCol = lCol;
-	this->rCol = rCol;
+
 	buildChessboard();
 	return true;
 }
 
 void GameScene::flip()
 {
-	Chessman tempChessman[maxLCol][maxRCol];
 	for (int i = 0; i < maxLCol; i++)
 	{
 		for (int j = i + 1; j < maxRCol; j++)
