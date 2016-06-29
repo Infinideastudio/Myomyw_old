@@ -23,7 +23,7 @@ void PvaGameScene::endMoving()
 {
 	Side originalTurn = turn;//去除这次endMoving才变成right的情况
 	GameScene::endMoving();
-	if (originalTurn == right) {
+	if (originalTurn == right && turn == right) {
 		if (AIMovementTimes > 0) {
 			if (chessmen[lCol - 1][movingCol] == Chessman::flip) {
 				AIMovementTimes = 1;

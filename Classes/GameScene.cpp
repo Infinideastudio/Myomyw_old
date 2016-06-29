@@ -77,8 +77,9 @@ void GameScene::setNextChessman(Chessman chessman)
 	auto old = this->getChildByName("next");
 	auto moveAction = MoveBy::create(nextChessmanChangeTime, Vec2(0, -20));
 	if (old) {
+		old->setName("");
 		auto fadeOutAction = FadeOut::create(nextChessmanChangeTime);
-		auto callAction = CallFunc::create([this]() {this->removeChildByName("next"); });
+		auto callAction = CallFunc::create([this, old]() {this->removeChild(old); });
 		auto sequenceAction = Sequence::create(fadeOutAction, callAction, NULL);
 		old->runAction(moveAction);
 		old->runAction(sequenceAction);
@@ -387,11 +388,12 @@ void GameScene::endMoving()
 			break;
 		}
 	}
-	if (lastChessman == Chessman::flip && controllable) {
-		changeTurn();
-	}
-	else {
-		if (controllable) {
+
+	if (controllable) {
+		if (lastChessman == Chessman::flip) {
+			changeTurn();
+		}
+		else {
 			if (touching && totalMovements < maxMovementTimes) {
 				scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol), movingCooling, "cool");
 				state = ActionState::cooling;
@@ -400,9 +402,9 @@ void GameScene::endMoving()
 				changeTurnAndSetTurnFlag();
 			}
 		}
-		else {
-			state = ActionState::nothing;
-		}
+	}
+	else {
+		state = ActionState::nothing;
 	}
 
 }
