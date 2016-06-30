@@ -114,7 +114,7 @@ bool MainScene::init()
 		updatePlayerLabel();
 	}
 
-	auto versionLabel = MyCreator::createLabel("Alpha 0.3", 25, Color4B(0, 0, 0, 255));
+	auto versionLabel = MyCreator::createLabel("Alpha 0.3.1", 25, Color4B(0, 0, 0, 255));
 	versionLabel->setPosition(visibleSize.width - versionLabel->getContentSize().width / 2, versionLabel->getContentSize().height / 2);
 	this->addChild(versionLabel);
 	return true;
