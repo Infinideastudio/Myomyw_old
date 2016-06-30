@@ -115,7 +115,6 @@ Room.prototype.createAndTellNextChessman = function () {
     this.nextChessman = this.getRandomChessman();
     this.leftPlayer.emit('nextChessman', { chessman: this.nextChessman });
     this.rightPlayer.emit('nextChessman', { chessman: this.nextChessman });
-    console.log('told');
 }
 
 Room.prototype.getRandomChessman = function () {
@@ -200,12 +199,15 @@ Room.prototype.move = function (col, chessman) {
                 break;
         }
     }
+    if (lastChessman == Chessman.flip) {
+        this.totalMovementTimes = config.maxMovementTimes;
+    }
     return false;
 }
 
 Room.prototype.flip = function () {
-    for (var i = 0; i < this.lCol; i++) {
-        for (var j = i + 1; j < this.rCol; j++) {
+    for (var i = 0; i < config.maxLCol; i++) {
+        for (var j = i + 1; j < config.maxRCol; j++) {
             this.chessmen[i][j] ^= this.chessmen[j][i];
             this.chessmen[j][i] ^= this.chessmen[i][j];
             this.chessmen[i][j] ^= this.chessmen[j][i];

@@ -145,6 +145,7 @@ void PvoGameScene::onStart(SIOClient * client, const std::string & data)
 	Json j(data);
 	if (j.getInt("side") == right) {
 		setTurn(right);
+		setTurnFlag();
 		controllable = false;
 	}
 	else {

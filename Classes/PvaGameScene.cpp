@@ -25,11 +25,17 @@ void PvaGameScene::endMoving()
 	GameScene::endMoving();
 	if (originalTurn == right) {
 		if (AIMovementTimes > 0) {
+			if (chessmen[lCol - 1][movingCol] == Chessman::flip) {
+				AIMovementTimes = 1;
+			}
 			AIMovementTimes--;
 			scheduleOnce([this](float) {beginMoving(movingCol); }, movingCooling, "cool");
 		}
 		else {
-			changeTurnAndSetTurnFlag();
+			changeTurn();
+			if (lastChessman != Chessman::flip) {
+				setTurnFlag();
+			}
 		}
 	}
 }
@@ -40,7 +46,7 @@ void PvaGameScene::changeTurn()
 	if (turn == right) {
 		controllable = false;
 		//切换回合后冷却一下再让AI下(否则看起来太突然)
-		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), movingCooling, "changeCool");
+		scheduleOnce(CC_CALLBACK_0(PvaGameScene::AIMove, this), aiThinkingTime, "changeCool");
 	}
 	else {
 		controllable = true;

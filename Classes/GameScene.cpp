@@ -77,8 +77,9 @@ void GameScene::setNextChessman(Chessman chessman)
 	auto old = this->getChildByName("next");
 	auto moveAction = MoveBy::create(nextChessmanChangeTime, Vec2(0, -20));
 	if (old) {
+		old->setName("");
 		auto fadeOutAction = FadeOut::create(nextChessmanChangeTime);
-		auto callAction = CallFunc::create([this]() {this->removeChildByName("next"); });
+		auto callAction = CallFunc::create([this, old]() {this->removeChild(old); });
 		auto sequenceAction = Sequence::create(fadeOutAction, callAction, NULL);
 		old->runAction(moveAction);
 		old->runAction(sequenceAction);
@@ -225,7 +226,7 @@ Sprite* GameScene::createSpriteByChessman(Chessman type)
 
 bool GameScene::ejectorTouchBeganCallback(Touch * touch, Event * event)
 {
-	if (controllable) {
+	if (controllable && state != ActionState::moving) {
 		//遍历当前边的发射器
 		for (int i = 0; i < (turn == left ? lCol : rCol); i++) {
 			//判断鼠标是否处于发射器内(45°倾斜的正方形)
@@ -255,37 +256,39 @@ void GameScene::ejectorTouchEndedCallback(Touch * touch, Event * event)
 
 bool GameScene::setBoardSize(int lCol, int rCol)
 {
-	if (lCol > maxLCol || lCol<minLCol || rCol>maxRCol || rCol < minRCol)
-		return false;
-	//如果棋盘变大，把多出来的那部分清空
-	if (this->lCol < lCol) {
-		for (int i = this->lCol; i < lCol; i++) {
-			for (int j = 0; j < rCol; j++) {
-				chessmen[i][j] = Chessman::common;
+	if (lCol <= maxLCol && lCol >= minLCol && rCol <= maxRCol && rCol >= minRCol)
+	{
+		//如果棋盘变大，把多出来的那部分清空
+		if (this->lCol < lCol) {
+			for (int i = this->lCol; i < lCol; i++) {
+				for (int j = 0; j < rCol; j++) {
+					chessmen[i][j] = Chessman::common;
+				}
 			}
 		}
-	}
-	if (this->rCol < rCol) {
-		for (int i = 0; i < lCol; i++) {
-			for (int j = this->rCol; j < rCol; j++) {
-				chessmen[i][j] = Chessman::common;
+		if (this->rCol < rCol) {
+			for (int i = 0; i < lCol; i++) {
+				for (int j = this->rCol; j < rCol; j++) {
+					chessmen[i][j] = Chessman::common;
+				}
 			}
 		}
+		board->setScale((float)(lCol + rCol) / (this->lCol + this->rCol));
+		auto scaleAction = ScaleTo::create(boardScaleTime, 1);
+		board->runAction(scaleAction);
+		this->lCol = lCol;
+		this->rCol = rCol;
 	}
-	board->setScale((float)(lCol + rCol) / (this->lCol + this->rCol));
-	auto scaleAction = ScaleTo::create(boardScaleTime, 1);
-	board->runAction(scaleAction);
-	this->lCol = lCol;
-	this->rCol = rCol;
+
 	buildChessboard();
 	return true;
 }
 
 void GameScene::flip()
 {
-	for (int i = 0; i < lCol; i++)
+	for (int i = 0; i < maxLCol; i++)
 	{
-		for (int j = i + 1; j < rCol; j++)
+		for (int j = i + 1; j < maxRCol; j++)
 		{
 			std::swap(chessmen[i][j], chessmen[j][i]);
 		}
@@ -330,7 +333,7 @@ void GameScene::beginMoving(int col)
 		for (int i = 0; i < (turn == left ? rCol : lCol); i++) {
 			chessmanNode->getChildByTag(turn == left ? movingCol*rCol + i : i*rCol + movingCol)->runAction(movingAction->clone());
 		}
-		newChessman->runAction(movingAction->clone());
+		newChessman->runAction(movingAction);
 		scheduleOnce(CC_CALLBACK_0(GameScene::endMoving, this), movingTime, "move");
 		totalMovements++;
 	}
@@ -338,7 +341,6 @@ void GameScene::beginMoving(int col)
 
 void GameScene::endMoving()
 {
-	Chessman lastChessman;//暂存最底下的棋子
 	if (turn == left) {
 		lastChessman = chessmen[movingCol][rCol - 1];
 		for (int i = rCol - 1; i > 0; i--) {
@@ -389,20 +391,23 @@ void GameScene::endMoving()
 	}
 
 	if (controllable) {
-		if (touching && totalMovements < maxMovementTimes) {
-			scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol), movingCooling, "cool");
-			state = ActionState::cooling;
+		if (lastChessman == Chessman::flip) {
+			changeTurn();
 		}
 		else {
-			changeTurn();
-			if (lastChessman != Chessman::flip) {
-				setTurnFlag();
+			if (touching && totalMovements < maxMovementTimes) {
+				scheduleOnce(CC_CALLBACK_0(GameScene::beginMoving, this, movingCol), movingCooling, "cool");
+				state = ActionState::cooling;
+			}
+			else {
+				changeTurnAndSetTurnFlag();
 			}
 		}
 	}
 	else {
 		state = ActionState::nothing;
 	}
+
 }
 
 void GameScene::setTurn(Side turn)

@@ -29,6 +29,7 @@ protected:
 	ActionState state;
 	int movingCol;//移动中的列
 	bool controllable = false;
+	Chessman lastChessman;//暂存最底下的棋子
 
 	void setNames(std::string left, std::string right);
 	Chessman getNextChessman() { return nextChessman; };
