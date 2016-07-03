@@ -28,6 +28,7 @@ io.on('connection', function (socket) {
         //如果房间为空，则建立房间并将玩家设为左边的玩家
         if (!rooms[i]) {
             found = true;
+            console.log("open room:" + i);
             rooms[i] = new Room(closeRoom.bind(this,i));
             rooms[i].setPlayer(left, socket);
             break;
@@ -35,9 +36,7 @@ io.on('connection', function (socket) {
         //如果房间为等待中，则将玩家设为右边的玩家并开始游戏
         if (!rooms[i].rightPlayer) {
             found = true;
-            console.log("start room:" + i);
             rooms[i].setPlayer(right, socket);
-            rooms[i].start(left);
             break;
         }
     }

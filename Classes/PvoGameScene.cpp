@@ -26,9 +26,11 @@ bool PvoGameScene::init()
 	board->addChild(timerStencil);
 
 	client = SocketIO::connect(Player::getServer(), *this);
+
 	if (!client)
 		return false;
 	client->on("connect", CC_CALLBACK_2(PvoGameScene::onConnect, this));
+	client->on("sendName", CC_CALLBACK_2(PvoGameScene::onSendName, this));
 	client->on("start", CC_CALLBACK_2(PvoGameScene::onStart, this));
 	client->on("nextChessman", CC_CALLBACK_2(PvoGameScene::onNextChessman, this));
 	client->on("move", CC_CALLBACK_2(PvoGameScene::onMove, this));
@@ -129,6 +131,7 @@ void PvoGameScene::rightWins()
 
 void PvoGameScene::onConnect(SIOClient * client, const std::string & data)
 {
+	client->emit("sendName", Player::getName());
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	roomLabel->setString(Lang::get("waiting"));
 	roomLabel->setPosition(visibleSize.width - roomLabel->getContentSize().width, roomLabel->getContentSize().height);
@@ -138,6 +141,12 @@ void PvoGameScene::onError(SIOClient * client, const std::string & data)
 {
 	MessageBox(("Error! " + data).c_str(), "Myomyw");
 	Director::getInstance()->replaceScene(MainScene::create());
+}
+
+void PvoGameScene::onSendName(SIOClient * client, const std::string & data)
+{
+	Json j(data);
+	setNames(Player::getName(), j.getString("name"));
 }
 
 void PvoGameScene::onStart(SIOClient * client, const std::string & data)

@@ -41,6 +41,7 @@ private:
 	void onConnect(SIOClient* client, const std::string &data);
 	void onError(SIOClient* client, const std::string &data);
 	void onClose(SIOClient* client) {};
+	void onSendName(SIOClient* client, const std::string &data);
 	void onStart(SIOClient* client, const std::string &data);
 	void onNextChessman(SIOClient* client, const std::string &data);
 	void onMove(SIOClient* client, const std::string &data);

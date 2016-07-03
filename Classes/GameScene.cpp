@@ -66,9 +66,9 @@ void GameScene::setNames(std::string left, std::string right)
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	leftNameLabel->setString(left);
-	leftNameLabel->setPosition(Vec2(leftNameLabel->getContentSize().width, visibleSize.height - leftNameLabel->getContentSize().height));
+	leftNameLabel->setPosition(Vec2(leftNameLabel->getContentSize().width + 10, visibleSize.height - leftNameLabel->getContentSize().height - 10));
 	rightNameLabel->setString(right);
-	rightNameLabel->setPosition(Vec2(visibleSize.width - rightNameLabel->getContentSize().width, visibleSize.height - rightNameLabel->getContentSize().height));
+	rightNameLabel->setPosition(Vec2(visibleSize.width - rightNameLabel->getContentSize().width - 10, visibleSize.height - rightNameLabel->getContentSize().height - 10));
 }
 
 void GameScene::setNextChessman(Chessman chessman)

@@ -1,6 +1,7 @@
 ﻿var config = require('./config.js')
 var EndReason = { opponentLeft: 1, youWin: 2, youLose: 3, timeOut: 4 };
 var Chessman = { unknow: 0, common: 1, key: 2, addCol: 3, delCol: 4, flip: 5 };
+var RoomState = { waiting: 0, playing: 1, over: 2 };
 const left = 0, right = 1;
 function Room(onClose) {
     this.chessmen = new Array();
@@ -13,11 +14,13 @@ function Room(onClose) {
     this.lCol = config.defaultLCol;
     this.rCol = config.defaultRCol;
     this.turn = left;
+    this.leftName = null;
+    this.rightName = null;
     this.leftPlayer = null;
     this.rightPlayer = null;
     this.nextChessman = null;
     this.movingCol = null;
-    this.over = false;
+    this.state = RoomState.waiting;
     this.totalMovementTimes = 0;
     this.timeOutHandle = null;
     this.close = onClose;
@@ -31,6 +34,7 @@ Room.prototype.setPlayer = function (side, socket) {
             this.rightPlayer = socket;
         }
         var room = this;
+        socket.on('sendName', this.onSendName.bind(this, side));
         socket.on('move', this.onMove.bind(this, side));
         socket.on('endTurn', this.onEndTurn.bind(this, side));
         socket.on('disconnect', this.onDisconnect.bind(this, side));
@@ -38,6 +42,7 @@ Room.prototype.setPlayer = function (side, socket) {
 }
 
 Room.prototype.start = function (turn) {
+    this.state = RoomState.playing;
     this.createAndTellNextChessman();
     this.leftPlayer.emit('start', { side: left });
     this.rightPlayer.emit('start', { side: right });
@@ -45,16 +50,30 @@ Room.prototype.start = function (turn) {
 }
 
 Room.prototype.currentPlayer = function () {
-    return this.turn == left ? this.leftPlayer : this.rightPlayer
+    return this.turn == left ? this.leftPlayer : this.rightPlayer;
 }
 
 Room.prototype.waitingPlayer = function () {
-    return this.turn == left ? this.rightPlayer : this.leftPlayer
+    return this.turn == left ? this.rightPlayer : this.leftPlayer;
+}
+
+Room.prototype.onSendName = function (side, data) {
+    if (this.state == RoomState.waiting) {
+        if (side == left && this.leftName == null) {
+            this.leftName = data;
+        }
+        else if (this.rightName == null) {
+            this.rightName = data;
+            this.leftPlayer.emit('sendName', { name: data });
+            this.rightPlayer.emit('sendName', { name: this.leftName });
+            this.start(left);
+        }
+    }
 }
 
 //只有每回合的第一次移动才传递col
 Room.prototype.onMove = function (side, data) {
-    if (side != this.turn) { return; }
+    if (side != this.turn || this.state != RoomState.playing) { return; }
     data = parseJSON(data);
     if ('col' in data && !this.movingCol) {
         this.movingCol = data.col;
@@ -66,7 +85,7 @@ Room.prototype.onMove = function (side, data) {
             this.currentPlayer().emit('endGame', { reason: EndReason.youWin });
             this.waitingPlayer().emit('endGame', { reason: EndReason.youLose });
             clearTimeout(this.timeOutHandle);
-            this.over = true;
+            this.state = RoomState.over;
             room.leftPlayer.disconnect();
             room.rightPlayer.disconnect();
             this.close();
@@ -80,7 +99,7 @@ Room.prototype.onMove = function (side, data) {
 }
 
 Room.prototype.onEndTurn = function (side) {
-    if (side != this.turn) { return; }
+    if (side != this.turn || this.state != RoomState.playing) { return; }
     if (this.movingCol != null) {
         this.movingCol = null;
         this.setTurn(this.turn == left ? right : left);
@@ -90,7 +109,7 @@ Room.prototype.onEndTurn = function (side) {
 
 Room.prototype.onDisconnect = function (side) {
     console.log('disconnected ' + (side == right ? this.rightPlayer : this.leftPlayer).id);
-    if (!this.over) {
+    if (this.state == RoomState.playing) {
         (side == left ? this.rightPlayer : this.leftPlayer).emit('endGame', { reason: EndReason.opponentLeft });
         clearTimeout(this.timeOutHandle);
         this.close();
